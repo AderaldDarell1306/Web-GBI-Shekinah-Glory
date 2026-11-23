@@ -143,7 +143,10 @@ class JemaatController extends Controller
         // Rekapitulasi Kategorial Pelayanan
         $rekapKategorial = Jemaat::getKategorialStats($wilayahId, $wilayahBesar);
 
-        return view('admin.jemaat.index', compact('jemaats', 'wilayahList', 'wilayahGrouped', 'rekapWilayahBesar', 'rekapKategorial'));
+        // Rekapitulasi Demografi Lengkap (PRD v2.2 Tahap 5)
+        $demo = Jemaat::getComprehensiveDemographics($wilayahId, $wilayahBesar);
+
+        return view('admin.jemaat.index', compact('jemaats', 'wilayahList', 'wilayahGrouped', 'rekapWilayahBesar', 'rekapKategorial', 'demo'));
     }
 
     /**
