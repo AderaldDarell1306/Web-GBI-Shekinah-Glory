@@ -181,3 +181,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/konten', [WebsiteContentController::class, 'index'])->name('konten.index');
     Route::post('/konten', [WebsiteContentController::class, 'update'])->name('konten.update');
 });
+
+// Helper route untuk melayani file storage di hosting (InfinityFree / Shared Hosting tanpa SSH symlink)
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) {
+        // Coba cek jika ada di public/storage langsung
+        $publicFilePath = public_path('storage/' . $path);
+        if (file_exists($publicFilePath)) {
+            return response()->file($publicFilePath);
+        }
+        abort(404);
+    }
+    return response()->file($filePath);
+})->where('path', '.*');
+
