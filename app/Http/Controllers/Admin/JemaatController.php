@@ -172,6 +172,22 @@ class JemaatController extends Controller
             ->groupBy('prefix')
             ->pluck('max_seq', 'prefix');
 
+        // Peta No. KK Baru berikutnya per Wilayah ID (Otomatis: [2 digit Prefix][2 digit No. Keluarga Baru][01])
+        $nextKKByWilayah = [];
+        foreach ($wilayahList as $w) {
+            $prefix = $w->kode_prefix;
+            $maxFam = Jemaat::selectRaw('MAX(CAST(SUBSTRING(no_kk, 3, 2) AS UNSIGNED)) as max_fam')
+                ->where('no_kk', 'like', $prefix . '%')
+                ->whereRaw('LENGTH(no_kk) >= 6')
+                ->value('max_fam');
+            $nextFamNum = ($maxFam ? (int)$maxFam : 0) + 1;
+            $nextFamStr = str_pad($nextFamNum, 2, '0', STR_PAD_LEFT);
+            $nextKKByWilayah[$w->id] = $prefix . $nextFamStr . '01';
+        }
+
+        // Peta seluruh No. KK yang sudah terdaftar untuk validasi anti-duplikasi instan di browser
+        $existingKKs = Jemaat::whereNotNull('no_kk')->where('no_kk', '!=', '')->pluck('nama_lengkap', 'no_kk');
+
         // Generate Nomor Induk Jemaat Otomatis jika diperlukan: JMT-YYYY-XXXX
         $currentYear = date('Y');
         $latestRecord = Jemaat::withTrashed()
@@ -185,7 +201,7 @@ class JemaatController extends Controller
         }
         $autoNij = sprintf('JMT-%s-%04d', $currentYear, $nextNumber);
 
-        return view('admin.jemaat.create', compact('wilayahList', 'autoNij', 'kepalaKeluargaList', 'maxSeqByPrefix'));
+        return view('admin.jemaat.create', compact('wilayahList', 'autoNij', 'kepalaKeluargaList', 'maxSeqByPrefix', 'nextKKByWilayah', 'existingKKs'));
     }
 
     /**
@@ -224,12 +240,23 @@ class JemaatController extends Controller
             'kategori_khusus' => 'nullable|string|max:50',
             'tanggal_bergabung' => 'nullable|date',
             'catatan' => 'nullable|string',
+            'ucapan_ultah' => 'nullable|string',
             'ignore_duplicate' => 'nullable|boolean',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'tanggal_lahir.before_or_equal' => 'Tanggal lahir tidak boleh di masa depan.',
         ]);
+
+        // Cek duplikasi No. KK / ID Jemaat
+        if (!empty($validated['no_kk'])) {
+            $existingKkJemaat = Jemaat::where('no_kk', $validated['no_kk'])->first();
+            if ($existingKkJemaat) {
+                return back()->withInput()->withErrors([
+                    'no_kk' => "Nomor KK/ID Jemaat '{$validated['no_kk']}' sudah terdaftar atas nama {$existingKkJemaat->nama_lengkap}. Harap gunakan nomor urut berikutnya agar tidak terjadi pendobelan data.",
+                ]);
+            }
+        }
 
         // Cek potensi duplikat
         if (!$request->boolean('ignore_duplicate') && !empty($validated['tanggal_lahir'])) {
@@ -346,7 +373,20 @@ class JemaatController extends Controller
             'kategori_khusus' => 'nullable|string|max:50',
             'tanggal_bergabung' => 'nullable|date',
             'catatan' => 'nullable|string',
+            'ucapan_ultah' => 'nullable|string',
         ]);
+
+        // Cek duplikasi No. KK / ID Jemaat (kecuali untuk data jemaat ini sendiri)
+        if (!empty($validated['no_kk'])) {
+            $existingKkJemaat = Jemaat::where('no_kk', $validated['no_kk'])
+                ->where('id', '!=', $jemaat->id)
+                ->first();
+            if ($existingKkJemaat) {
+                return back()->withInput()->withErrors([
+                    'no_kk' => "Nomor KK/ID Jemaat '{$validated['no_kk']}' sudah digunakan oleh {$existingKkJemaat->nama_lengkap}. Harap gunakan nomor urut lain agar tidak terjadi pendobelan data.",
+                ]);
+            }
+        }
 
         // Otomatis tentukan wilayah_id dari 2 digit pertama no_kk jika belum diisi
         if (empty($validated['wilayah_id']) && !empty($validated['no_kk']) && strlen($validated['no_kk']) >= 2) {

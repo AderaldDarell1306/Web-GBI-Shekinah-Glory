@@ -59,7 +59,13 @@
                     <!-- KK -->
                     <div class="md:col-span-4 space-y-1">
                         <label for="no_kk" class="block text-xs font-bold text-primary">No. KK / ID Jemaat (6 Digit)</label>
-                        <input type="text" name="no_kk" id="no_kk" value="{{ old('no_kk', $jemaat->no_kk) }}" placeholder="Contoh: 310101" class="w-full px-3 py-2.5 rounded-xl border border-outline-variant/60 text-xs focus:border-secondary focus:outline-none transition font-mono font-bold">
+                        <input type="text" name="no_kk" id="no_kk" value="{{ old('no_kk', $jemaat->no_kk) }}" placeholder="Contoh: 310101" class="w-full px-3 py-2.5 rounded-xl border @error('no_kk') border-red-500 bg-red-50/50 @else border-outline-variant/60 @enderror text-xs focus:border-secondary focus:outline-none transition font-mono font-bold">
+                        @error('no_kk')
+                        <p class="text-3xs text-red-600 font-semibold mt-1 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">error</span>
+                            <span>{{ $message }}</span>
+                        </p>
+                        @enderror
                     </div>
 
                     <!-- NIK -->

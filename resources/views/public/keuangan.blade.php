@@ -59,16 +59,15 @@
         </div>
     </div>
 
-    <!-- Category Breakdown Overview & Diagram Bulat -->
+    <!-- Category Breakdown Overview & Komposisi Kas -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10" data-aos="fade-up" data-aos-delay="150">
-        <!-- Diagram Bulat Arus Kas -->
+        <!-- Arus Kas -->
         <div class="lg:col-span-4 bg-white rounded-2xl p-6 border border-outline-variant/30 shadow-xs flex flex-col justify-between">
             <h4 class="font-serif-display text-base font-bold text-primary flex items-center justify-between border-b border-outline-variant/20 pb-3 mb-4">
                 <span class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px] text-secondary">donut_large</span>
-                    <span>Diagram Bulat Kas</span>
+                    <span>Komposisi Arus Kas</span>
                 </span>
-                <span class="text-2xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Angka di Dalam</span>
             </h4>
             <div class="relative w-full h-52 flex items-center justify-center my-auto">
                 <canvas id="publicChartKeuanganDonut"></canvas>

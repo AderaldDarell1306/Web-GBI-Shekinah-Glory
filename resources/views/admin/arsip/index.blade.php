@@ -118,7 +118,8 @@
                         <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No & Tanggal</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jenis & Kategori</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Pengirim / Tujuan</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Perihal & Ringkasan</th>
+                        <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Hal &amp; Lampiran</th>
+                        <th class="px-5 py-3.5 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Akses Jemaat (Kode)</th>
                         <th class="px-5 py-3.5 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Berkas Scan</th>
                         <th class="px-5 py-3.5 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -142,8 +143,34 @@
                             </td>
                             <td class="px-5 py-4">
                                 <div class="font-semibold text-gray-900">{{ $item->perihal }}</div>
+                                @if($item->lampiran)
+                                    <div class="text-xs text-amber-700 font-medium mt-0.5 flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                        <span>Lampiran: {{ $item->lampiran }}</span>
+                                    </div>
+                                @endif
                                 @if($item->ringkasan_isi)
                                     <div class="text-xs text-gray-500 line-clamp-1 mt-0.5">{{ $item->ringkasan_isi }}</div>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4 whitespace-nowrap text-center">
+                                @if($item->kode_akses)
+                                    <div class="inline-flex flex-col items-center gap-1">
+                                        <span class="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-mono font-bold text-xs">
+                                            {{ $item->kode_akses }}
+                                        </span>
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            <button type="button" onclick="salinKode('{{ $item->kode_akses }}')" class="text-[11px] text-gray-500 hover:text-primary transition underline font-medium" title="Salin Kode">
+                                                Salin
+                                            </button>
+                                            <span class="text-gray-300">•</span>
+                                            <a href="https://api.whatsapp.com/send?text={{ urlencode('Syalom, surat resmi Anda dengan perihal \"' . $item->perihal . '\" telah terbit dari Sekretariat GBI Shekinah Glory. Anda dapat mengakses & mengunduh berkas surat melalui website kami di menu Layanan -> Cek & Unduh Surat dengan Kode Akses: ' . $item->kode_akses . ' atau klik: ' . url('/layanan/surat?kode=' . $item->kode_akses)) }}" target="_blank" class="text-[11px] text-emerald-600 hover:text-emerald-700 transition font-bold" title="Kirim Kode Akses via WhatsApp">
+                                                Kirim WA
+                                            </a>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-xs text-gray-400 italic">Internal</span>
                                 @endif
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap text-center">
@@ -173,7 +200,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
                                     <p class="text-sm font-medium text-gray-900">Belum ada arsip surat pada tahun kalender {{ $tahun }}</p>
@@ -255,6 +282,22 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Perihal / Judul Surat *</label>
                 <input type="text" name="perihal" required placeholder="Contoh: Undangan Sidang Majelis Daerah GBI NTT" class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Lampiran Dokumen</label>
+                    <input type="text" name="lampiran" placeholder="Contoh: 1 Berkas / 2 Lembar / -" class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 flex items-center justify-between">
+                        <span>Kode Akses Jemaat</span>
+                        <button type="button" onclick="generateKodeAkses('create_kode_akses')" class="text-[10px] text-amber-700 hover:text-amber-800 font-bold underline">
+                            + Generate
+                        </button>
+                    </label>
+                    <input type="text" name="kode_akses" id="create_kode_akses" placeholder="Contoh: SK-2026-001" class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary font-mono uppercase">
+                </div>
             </div>
 
             <div>
@@ -349,6 +392,22 @@
                 <input type="text" name="perihal" id="edit_perihal" required class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary">
             </div>
 
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Lampiran Dokumen</label>
+                    <input type="text" name="lampiran" id="edit_lampiran" placeholder="Contoh: 1 Berkas / -" class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1 flex items-center justify-between">
+                        <span>Kode Akses Jemaat</span>
+                        <button type="button" onclick="generateKodeAkses('edit_kode_akses')" class="text-[10px] text-amber-700 hover:text-amber-800 font-bold underline">
+                            + Generate
+                        </button>
+                    </label>
+                    <input type="text" name="kode_akses" id="edit_kode_akses" placeholder="Contoh: SK-2026-001" class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary font-mono uppercase">
+                </div>
+            </div>
+
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Ringkasan / Uraian Isi Surat</label>
                 <textarea name="ringkasan_isi" id="edit_ringkasan" rows="2" class="w-full text-sm rounded-lg border-gray-300 focus:border-primary focus:ring-primary"></textarea>
@@ -395,6 +454,8 @@ function openEditModal(item) {
     document.getElementById('edit_pengirim').value = item.pengirim;
     document.getElementById('edit_tujuan').value = item.tujuan_penerima;
     document.getElementById('edit_perihal').value = item.perihal;
+    document.getElementById('edit_lampiran').value = item.lampiran || '';
+    document.getElementById('edit_kode_akses').value = item.kode_akses || '';
     document.getElementById('edit_ringkasan').value = item.ringkasan_isi || '';
     document.getElementById('edit_status').value = item.status;
 
@@ -402,6 +463,18 @@ function openEditModal(item) {
 }
 function closeEditModal() {
     document.getElementById('editModal').classList.add('hidden');
+}
+
+function generateKodeAkses(targetId) {
+    const yr = new Date().getFullYear();
+    const rnd = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById(targetId).value = 'SK-' + yr + '-' + rnd;
+}
+
+function salinKode(kode) {
+    navigator.clipboard.writeText(kode).then(() => {
+        alert('Kode Akses ' + kode + ' berhasil disalin ke clipboard!');
+    });
 }
 </script>
 @endsection

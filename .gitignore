@@ -30,4 +30,5 @@
 /vendor
 Homestead.json
 Homestead.yaml
+cloudflared.exe
 Thumbs.db

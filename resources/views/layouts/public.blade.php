@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'GBI Shekinah Glory - Menjadi Terang dan Tempat Kemuliaan Tuhan Hadir Nyata')</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo.jpg') }}">
+    <link rel="shortcut icon" href="{{ asset('images/logo.jpg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.jpg') }}">
     <meta name="description" content="Website resmi GBI Shekinah Glory. Informasi jadwal ibadah raya, pemuda, anak, lokasi gereja, serta pelayanan jemaat.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,9 +115,30 @@
                 <a href="{{ request()->routeIs('public.beranda') ? '#lokasi-kontak' : url('/#lokasi-kontak') }}" class="text-on-surface-variant hover:text-primary transition-colors">
                     Lokasi
                 </a>
-                <a href="{{ route('public.pendaftaran') }}" class="{{ request()->routeIs('public.pendaftaran*') ? 'text-primary font-bold border-b-2 border-secondary pb-1' : 'text-on-surface-variant hover:text-primary' }} transition-colors">
-                    Pendaftaran
-                </a>
+                
+                <!-- DROPDOWN MENU LAYANAN (MENGGANTIKAN PENDAFTARAN - PRD v2.2) -->
+                <div class="relative group" id="desktopLayananDropdown">
+                    <button type="button" class="flex items-center gap-1 {{ (request()->routeIs('public.pendaftaran*') || request()->is('layanan*')) ? 'text-primary font-bold border-b-2 border-secondary pb-1' : 'text-on-surface-variant hover:text-primary' }} transition-colors py-1 focus:outline-none">
+                        <span>Layanan</span>
+                        <span class="material-symbols-outlined text-[16px] transition-transform duration-200 group-hover:rotate-180">expand_more</span>
+                    </button>
+                    <div class="absolute left-0 top-full pt-2 w-56 hidden group-hover:block transition-all z-50">
+                        <div class="bg-white rounded-xl shadow-xl border border-outline-variant/30 py-2 px-1.5 space-y-0.5">
+                            <!-- 1. Pendaftaran Sakramen & Pelayanan -->
+                            <a href="{{ route('public.pendaftaran') }}" class="block px-3.5 py-2.5 rounded-lg hover:bg-surface-container text-xs font-semibold text-primary transition">
+                                Formulir Pendaftaran
+                            </a>
+                            <!-- 2. Cek & Unduh Surat via Kode Unik -->
+                            <a href="{{ route('public.layanan.surat') }}" class="block px-3.5 py-2.5 rounded-lg hover:bg-surface-container text-xs font-semibold text-primary transition">
+                                Cek &amp; Unduh Surat
+                            </a>
+                            <!-- 3. Form Peminjaman Inventaris -->
+                            <a href="{{ route('public.layanan.pinjam-inventaris') }}" class="block px-3.5 py-2.5 rounded-lg hover:bg-surface-container text-xs font-semibold text-primary transition">
+                                Peminjaman Inventaris
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -128,7 +152,7 @@
             </div>
         </div>
 
-        <!-- Mobile Drawer Menu (Pilihan Utama: Beranda, Tentang, Jemaat, Keuangan, Lokasi) -->
+        <!-- Mobile Drawer Menu (Pilihan Utama: Beranda, Tentang, Jemaat, Keuangan, Lokasi, Layanan) -->
         <nav id="mobile-drawer" class="hidden lg:hidden bg-white/95 backdrop-blur-xl border-t border-outline-variant/30 px-6 py-4 shadow-xl flex flex-col gap-2">
             <a href="{{ route('public.beranda') }}" onclick="document.getElementById('mobile-drawer').classList.add('hidden')" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('public.beranda') ? 'text-primary font-bold bg-surface-container' : 'text-on-surface-variant hover:text-secondary' }}">
                 <span class="material-symbols-outlined text-[20px]">church</span>
@@ -150,10 +174,20 @@
                 <span class="material-symbols-outlined text-[20px]">location_on</span>
                 <span>Lokasi</span>
             </a>
-            <a href="{{ route('public.pendaftaran') }}" onclick="document.getElementById('mobile-drawer').classList.add('hidden')" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('public.pendaftaran*') ? 'text-primary font-bold bg-surface-container' : 'text-on-surface-variant hover:text-secondary' }}">
-                <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
-                <span>Pendaftaran</span>
-            </a>
+
+            <!-- Dropdown / List Layanan Mobile -->
+            <div class="pt-2 pb-1 border-t border-outline-variant/30 my-1 space-y-0.5">
+                <span class="px-3 text-[10px] font-bold text-secondary uppercase tracking-wider block mb-1">Layanan</span>
+                <a href="{{ route('public.pendaftaran') }}" onclick="document.getElementById('mobile-drawer').classList.add('hidden')" class="block px-3 py-2 rounded-lg text-xs font-semibold {{ request()->routeIs('public.pendaftaran*') ? 'text-primary bg-surface-container' : 'text-on-surface-variant hover:text-secondary' }}">
+                    Formulir Pendaftaran
+                </a>
+                <a href="{{ route('public.layanan.surat') }}" onclick="document.getElementById('mobile-drawer').classList.add('hidden')" class="block px-3 py-2 rounded-lg text-xs font-semibold {{ request()->routeIs('public.layanan.surat*') ? 'text-primary bg-surface-container' : 'text-on-surface-variant hover:text-secondary' }}">
+                    Cek &amp; Unduh Surat
+                </a>
+                <a href="{{ route('public.layanan.pinjam-inventaris') }}" onclick="document.getElementById('mobile-drawer').classList.add('hidden')" class="block px-3 py-2 rounded-lg text-xs font-semibold {{ request()->routeIs('public.layanan.pinjam-inventaris*') ? 'text-primary bg-surface-container' : 'text-on-surface-variant hover:text-secondary' }}">
+                    Peminjaman Inventaris
+                </a>
+            </div>
             <div class="pt-2 border-t border-outline-variant/30 flex flex-col gap-2">
                 <a href="{{ request()->routeIs('public.beranda') ? '#lokasi-kontak' : url('/#lokasi-kontak') }}" onclick="document.getElementById('mobile-drawer').classList.add('hidden')" class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-secondary text-white text-xs font-bold shadow-xs">
                     <span class="material-symbols-outlined text-[16px]">call</span>
@@ -203,14 +237,6 @@
                         </p>
                     </div>
                 </div>
-
-                <!-- Verse Motto -->
-                <div class="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl max-w-md">
-                    <span class="text-[10px] text-secondary-fixed-dim uppercase tracking-widest font-bold block mb-0.5">Visi Pelayanan (Yesaya 60:1)</span>
-                    <p class="text-xs text-white/90 italic">
-                        "Bangkitlah, menjadi teranglah, sebab terangmu datang, dan kemuliaan TUHAN terbit atasmu."
-                    </p>
-                </div>
             </div>
 
             <!-- 3-Column Grid (Kebaktian Dihapus, Tampilan Lebih Lapang & Elegan) -->
@@ -221,17 +247,31 @@
                     <p class="text-white/70 leading-relaxed text-xs">
                         GBI Shekinah Glory Namosain berkomitmen memuridkan setiap generasi melalui hadirat Tuhan yang intim, kebenaran firman yang murni, persekutuan komunitas sel (COOL), dan pelayanan kasih nyata bagi masyarakat Kota Kupang.
                     </p>
-                    <div class="flex items-center gap-2.5 pt-2">
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-secondary transition flex items-center justify-center text-white" title="Instagram Resmi">
-                            <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                    <div class="flex flex-wrap items-center gap-2.5 pt-2">
+                        <!-- Facebook (Gbi Shekinah Glory) -->
+                        <a href="https://www.facebook.com/search/top?q=Gbi%20Shekinah%20Glory" target="_blank" rel="noopener noreferrer" class="h-9 px-3 rounded-xl bg-white/10 hover:bg-[#1877F2] transition flex items-center gap-2 text-white group" title="Facebook: Gbi Shekinah Glory">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                            <span class="text-xs font-semibold">Gbi Shekinah Glory</span>
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-secondary transition flex items-center justify-center text-white" title="YouTube Streaming">
-                            <span class="material-symbols-outlined text-[18px]">smart_display</span>
+
+                        <!-- Instagram (gbi_shekinahglory) -->
+                        <a href="https://www.instagram.com/gbi_shekinahglory" target="_blank" rel="noopener noreferrer" class="h-9 px-3 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-[#833ab4] hover:via-[#fd1d1d] hover:to-[#fcb045] transition flex items-center gap-2 text-white group" title="Instagram: @gbi_shekinahglory">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                            <span class="text-xs font-semibold">gbi_shekinahglory</span>
                         </a>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $contents['whatsapp'] ?? '6281288997700') }}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-secondary transition flex items-center justify-center text-white" title="WhatsApp Sekretariat">
+
+                        <!-- WhatsApp (082247292194) -->
+                        <a href="https://wa.me/6282247292194" target="_blank" rel="noopener noreferrer" class="h-9 px-3 rounded-xl bg-white/10 hover:bg-[#25D366] transition flex items-center gap-2 text-white group" title="WhatsApp: 082247292194">
                             <span class="material-symbols-outlined text-[18px]">chat</span>
+                            <span class="text-xs font-semibold">082247292194</span>
                         </a>
-                        <a href="{{ $contents['google_maps_url'] ?? 'https://maps.app.goo.gl/uuA2zD3FbzX676JRA' }}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-secondary transition flex items-center justify-center text-white" title="Google Maps">
+
+                        <!-- Google Maps -->
+                        <a href="{{ $contents['google_maps_url'] ?? 'https://maps.app.goo.gl/uuA2zD3FbzX676JRA' }}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-secondary transition flex items-center justify-center text-white" title="Lokasi Google Maps">
                             <span class="material-symbols-outlined text-[18px]">near_me</span>
                         </a>
                     </div>
@@ -262,7 +302,7 @@
                         </div>
                         <div class="flex items-center gap-2.5">
                             <span class="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">phone_iphone</span>
-                            <span>{{ $contents['whatsapp'] ?? '+62 812-8899-7700' }}</span>
+                            <span>{{ $contents['whatsapp'] ?? '082247292194' }}</span>
                         </div>
                         <div class="flex items-center gap-2.5">
                             <span class="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">email</span>

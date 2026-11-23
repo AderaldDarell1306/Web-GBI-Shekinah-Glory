@@ -91,7 +91,7 @@ class WartaJemaat extends Model
 
         $jemaats = Jemaat::with('wilayah')
             ->whereNotNull('tanggal_lahir')
-            ->select('id', 'nama_lengkap', 'tanggal_lahir', 'no_hp', 'wilayah_id', 'jenis_kelamin')
+            ->select('id', 'nama_lengkap', 'tanggal_lahir', 'no_hp', 'wilayah_id', 'jenis_kelamin', 'ucapan_ultah')
             ->get();
 
         $result = collect();

@@ -130,14 +130,15 @@
                 </div>
 
                 <div id="buletin_upload_wrap" class="{{ ($warta->buletin_tipe ?? '') === 'upload' ? '' : 'hidden' }}">
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Upload / Ganti File Buletin (PDF, Maks 20 MB)</label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Upload / Ganti File Buletin (PDF / Publisher .PUB / Word, Maks 30 MB)</label>
                     @if($warta->buletin_file)
                         <div class="mb-2 text-xs text-secondary font-semibold flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
-                            <span>File Buletin Tersimpan: <a href="{{ asset('storage/' . $warta->buletin_file) }}" target="_blank" class="underline">Lihat Dokumen</a></span>
+                            <span class="material-symbols-outlined text-[16px]">attach_file</span>
+                            <span>File Buletin Tersimpan ({{ strtoupper(pathinfo($warta->buletin_file, PATHINFO_EXTENSION)) }}): <a href="{{ asset('storage/' . $warta->buletin_file) }}" target="_blank" class="underline">Lihat / Unduh Dokumen</a></span>
                         </div>
                     @endif
-                    <input type="file" name="buletin_file" accept=".pdf" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-secondary file:text-white hover:file:bg-secondary/90">
+                    <input type="file" name="buletin_file" accept=".pdf,.pub,.docx,.doc,.jpg,.jpeg,.png,.zip" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-secondary file:text-white hover:file:bg-secondary/90">
+                    <p class="text-[11px] text-gray-400 mt-1">Mendukung file Microsoft Publisher (.pub), PDF, Word (.docx), atau Gambar.</p>
                 </div>
 
                 <div id="buletin_link_wrap" class="{{ ($warta->buletin_tipe ?? '') === 'link' ? '' : 'hidden' }}">

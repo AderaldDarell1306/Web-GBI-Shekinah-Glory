@@ -41,6 +41,7 @@ class Jemaat extends Model
         'kategori_khusus',
         'tanggal_bergabung',
         'catatan',
+        'ucapan_ultah',
         'created_by',
         'updated_by',
     ];
@@ -298,5 +299,143 @@ class Jemaat extends Model
         }
 
         return $stats;
+    }
+
+    /**
+     * Rekapitulasi Demografi Lengkap (PRD v2.2 Tahap 5):
+     * Kaum, Gender, Pendidikan, Jumlah KK, Status Baptis, Penyerahan Anak, Kategori Khusus (Diakonia)
+     */
+    public static function getComprehensiveDemographics(?int $wilayahId = null, ?string $wilayahBesar = null): array
+    {
+        $query = static::with('wilayah');
+        if ($wilayahId) {
+            $query->where('wilayah_id', $wilayahId);
+        } elseif ($wilayahBesar) {
+            $query->whereHas('wilayah', fn($q) => $q->where('wilayah_besar', $wilayahBesar));
+        }
+
+        $all = $query->get();
+        $totalJemaat = $all->count();
+        $jemaatAktif = $all->where('status_keanggotaan', 'aktif')->count();
+
+        $gender = ['pria' => 0, 'wanita' => 0];
+        $kategorial = ['kaum_bapak' => 0, 'kaum_ibu' => 0, 'pemuda_remaja' => 0, 'anak' => 0];
+        $baptis = ['sudah' => 0, 'belum' => 0];
+        $penyerahan = ['sudah' => 0, 'belum' => 0, 'total_anak' => 0];
+        $diakonia = ['janda' => 0, 'duda' => 0, 'yatim_piatu' => 0, 'lansia' => 0, 'disabilitas' => 0];
+        $kkMap = [];
+        $kkWilayah = ['Namosain' => 0, 'Rumah 7' => 0, 'Osmok' => 0];
+        $pendidikanMap = [];
+        $pekerjaanMap = [];
+
+        foreach ($all as $j) {
+            // 1. Gender
+            if ($j->jenis_kelamin === 'L') {
+                $gender['pria']++;
+            } else {
+                $gender['wanita']++;
+            }
+
+            // 2. Kepala Keluarga (KK)
+            if (!empty($j->no_kk) && strlen($j->no_kk) >= 4) {
+                $kkCode = substr($j->no_kk, 0, 4);
+                if (!isset($kkMap[$kkCode])) {
+                    $kkMap[$kkCode] = true;
+                    $wBesar = $j->wilayah_besar;
+                    if ($wBesar && isset($kkWilayah[$wBesar])) {
+                        $kkWilayah[$wBesar]++;
+                    }
+                }
+            }
+
+            // 3. Kategorial Per Kaum
+            $kat = $j->kategorial_pelayanan;
+            if ($kat === 'Kaum Bapak') $kategorial['kaum_bapak']++;
+            elseif ($kat === 'Kaum Ibu') $kategorial['kaum_ibu']++;
+            elseif ($kat === 'Pemuda & Remaja') $kategorial['pemuda_remaja']++;
+            elseif ($kat === 'Anak-Anak') $kategorial['anak']++;
+
+            // 4. Status Baptis
+            $sb = strtoupper(trim((string)$j->status_baptis));
+            if ((str_contains($sb, 'BAPTIS') && !str_starts_with($sb, 'B.') && !str_contains($sb, 'BELUM')) || str_contains($sb, 'SIDI')) {
+                $baptis['sudah']++;
+            } else {
+                $baptis['belum']++;
+            }
+
+            // 5. Status Penyerahan Anak (Anak usia <= 14 thn atau kategori Anak-Anak atau status_baptis penyerahan)
+            $isAnak = ($kat === 'Anak-Anak' || str_contains($sb, 'PENYERAHAN') || str_contains($sb, 'PENYARAHAN'));
+            if ($isAnak) {
+                $penyerahan['total_anak']++;
+                if ((str_contains($sb, 'PENYERAHAN') || str_contains($sb, 'PENYARAHAN')) && !str_starts_with($sb, 'B.') && !str_contains($sb, 'BELUM')) {
+                    $penyerahan['sudah']++;
+                } else {
+                    $penyerahan['belum']++;
+                }
+            }
+
+            // 6. Kategori Khusus / Diakonia
+            $label = $j->diakonia_label;
+            if ($label === 'Janda') $diakonia['janda']++;
+            elseif ($label === 'Duda') $diakonia['duda']++;
+            elseif (in_array($label, ['Yatim', 'Piatu', 'Yatim Piatu'])) $diakonia['yatim_piatu']++;
+            
+            if ($j->umur && $j->umur >= 60) {
+                $diakonia['lansia']++;
+            }
+
+            $ket = strtolower(trim((string)$j->keterangan . ' ' . (string)$j->kategori_khusus));
+            if (str_contains($ket, 'disabilitas') || str_contains($ket, 'cacat') || str_contains($ket, 'tuna')) {
+                $diakonia['disabilitas']++;
+            }
+
+            // 7. Pendidikan
+            $pdk = !empty($j->pendidikan) ? strtoupper(trim($j->pendidikan)) : 'BELUM TERDATA';
+            if (str_contains($pdk, 'S2') || str_contains($pdk, 'MAGISTER')) $group = 'S2 (Magister)';
+            elseif (str_contains($pdk, 'SARJANA') || str_contains($pdk, 'S1')) $group = 'S1 (Sarjana)';
+            elseif (str_contains($pdk, 'DIPLOMA') || str_contains($pdk, 'D3') || str_contains($pdk, 'D1') || str_contains($pdk, 'D2')) $group = 'Diploma (D3)';
+            elseif (str_contains($pdk, 'SLTA') || str_contains($pdk, 'SMA') || str_contains($pdk, 'SMK')) $group = 'SMA/SMK';
+            elseif (str_contains($pdk, 'SMP') || str_contains($pdk, 'SLTP')) $group = 'SMP';
+            elseif (str_contains($pdk, 'SD')) $group = 'SD';
+            elseif (str_contains($pdk, 'TK') || str_contains($pdk, 'PAUD')) $group = 'PAUD/TK';
+            else $group = 'Belum Terdata / Lainnya';
+            $pendidikanMap[$group] = ($pendidikanMap[$group] ?? 0) + 1;
+
+            // 8. Pekerjaan
+            $pkj = !empty($j->pekerjaan) ? ucwords(strtolower(trim($j->pekerjaan))) : 'Belum Bekerja / Lainnya';
+            if ($pkj === '-' || $pkj === '') $pkj = 'Belum Bekerja / Lainnya';
+            $pekerjaanMap[$pkj] = ($pekerjaanMap[$pkj] ?? 0) + 1;
+        }
+
+        $totalKk = count($kkMap);
+        $avgJiwaPerKk = $totalKk > 0 ? round($totalJemaat / $totalKk, 1) : 0;
+        $pctPria = $totalJemaat > 0 ? round(($gender['pria'] / $totalJemaat) * 100, 1) : 0;
+        $pctWanita = $totalJemaat > 0 ? round(($gender['wanita'] / $totalJemaat) * 100, 1) : 0;
+        $pctBaptis = $totalJemaat > 0 ? round(($baptis['sudah'] / $totalJemaat) * 100, 1) : 0;
+        $pctPenyerahan = $penyerahan['total_anak'] > 0 ? round(($penyerahan['sudah'] / $penyerahan['total_anak']) * 100, 1) : 0;
+
+        arsort($pendidikanMap);
+        arsort($pekerjaanMap);
+
+        return [
+            'totalJemaat' => $totalJemaat,
+            'jemaatAktif' => $jemaatAktif,
+            'gender' => $gender,
+            'pctPria' => $pctPria,
+            'pctWanita' => $pctWanita,
+            'totalKk' => $totalKk,
+            'avgJiwaPerKk' => $avgJiwaPerKk,
+            'kkWilayah' => $kkWilayah,
+            'kategorial' => $kategorial,
+            'baptis' => $baptis,
+            'pctBaptis' => $pctBaptis,
+            'penyerahan' => $penyerahan,
+            'pctPenyerahan' => $pctPenyerahan,
+            'diakonia' => $diakonia,
+            'totalDiakonia' => array_sum($diakonia),
+            'pendidikanMap' => $pendidikanMap,
+            'pekerjaanMap' => $pekerjaanMap,
+            'topPekerjaan' => array_slice($pekerjaanMap, 0, 6, true),
+        ];
     }
 }

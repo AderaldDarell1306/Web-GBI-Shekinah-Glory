@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\MajelisController;
 use App\Http\Controllers\Admin\InventarisController;
 use App\Http\Controllers\Admin\PeminjamanInventarisController;
 use App\Http\Controllers\Admin\DokumentasiFotoController;
+use App\Http\Controllers\Admin\PresensiPelayanController;
+use App\Http\Controllers\Admin\UlangTahunController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,13 +43,23 @@ Route::get('/kontak', [PublicController::class, 'kontak'])->name('public.kontak'
 Route::post('/kontak/kirim-pesan', [PublicController::class, 'kirimPesan'])->name('public.kirim-pesan');
 Route::post('/kontak/kirim-doa', [PublicController::class, 'kirimPesan'])->name('public.kirim-doa');
 
-// Portal Pendaftaran Mandiri Jemaat (Sakramen, Jemaat Baru, Surat Pindah)
+// Portal Pendaftaran Mandiri Jemaat (Sakramen, Jemaat Baru)
 Route::get('/pendaftaran', [PublicController::class, 'pendaftaran'])->name('public.pendaftaran');
 Route::post('/pendaftaran', [PublicController::class, 'submitPendaftaran'])->name('public.pendaftaran.submit');
 Route::get('/pendaftaran/sukses/{id}', [PublicController::class, 'pendaftaranSukses'])->name('public.pendaftaran.sukses');
 
-// Warta Jemaat Digital (Publik)
+// Modul Layanan Publik Tambahan (PRD v2.2 - Cek Surat & Pinjam Inventaris)
+Route::prefix('layanan')->name('public.layanan.')->group(function () {
+    Route::get('/surat', [PublicController::class, 'cekSurat'])->name('surat');
+    Route::post('/surat/cek', [PublicController::class, 'cekSurat'])->name('surat.cek');
+    Route::get('/pinjam-inventaris', [PublicController::class, 'pinjamInventaris'])->name('pinjam-inventaris');
+    Route::post('/pinjam-inventaris', [PublicController::class, 'submitPinjamInventaris'])->name('pinjam-inventaris.submit');
+    Route::get('/pinjam-inventaris/sukses/{id}', [PublicController::class, 'pinjamInventarisSukses'])->name('pinjam-inventaris.sukses');
+});
+
+// Warta Jemaat Digital & Buletin (Publik)
 Route::get('/warta', [PublicController::class, 'warta'])->name('public.warta');
+Route::get('/warta/{id}', [PublicController::class, 'wartaDetail'])->name('public.warta.detail');
 
 // Galeri Dokumentasi Foto Kegiatan (Publik - PRD Modul 10 AC-R06)
 Route::get('/dokumentasi', [PublicController::class, 'dokumentasi'])->name('public.dokumentasi');
@@ -72,6 +84,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/jemaat/import/csv', [JemaatController::class, 'importCsv'])->name('jemaat.import');
     Route::get('/jemaat/export/csv', [JemaatController::class, 'exportCsv'])->name('jemaat.export');
     Route::resource('jemaat', JemaatController::class);
+
+    // Modul Khusus: Ucapan & Kartu Ulang Tahun Jemaat (Dedicated Menu)
+    Route::get('/ulang-tahun', [UlangTahunController::class, 'index'])->name('ulang-tahun.index');
+    Route::put('/ulang-tahun/{id}', [UlangTahunController::class, 'update'])->name('ulang-tahun.update');
+    Route::post('/ulang-tahun/{id}/reset', [UlangTahunController::class, 'reset'])->name('ulang-tahun.reset');
 
     // Modul 2: Sakramen, Dokumen Pastoral & Cetak Sertifikat
     Route::prefix('sakramen')->name('sakramen.')->group(function () {
@@ -102,6 +119,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     // Modul 4: Penjadwalan Pelayanan Ibadah (Service Rota) & Anti-Bentrok
+    Route::get('/presensi-pelayan', [PresensiPelayanController::class, 'index'])->name('presensi.index');
+    Route::post('/presensi-pelayan', [PresensiPelayanController::class, 'store'])->name('presensi.store');
     Route::resource('pelayanan', PelayananController::class);
 
     // Modul 3: Keuangan & Persembahan (Finance & Tithe Management)

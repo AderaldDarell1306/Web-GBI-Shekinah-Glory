@@ -71,7 +71,9 @@ class ArsipSuratController extends Controller
             'pengirim' => 'required|string|max:150',
             'tujuan_penerima' => 'required|string|max:150',
             'perihal' => 'required|string|max:255',
+            'lampiran' => 'nullable|string|max:100',
             'kategori_surat' => 'required|string|max:50',
+            'kode_akses' => 'nullable|string|max:50|unique:arsip_surat,kode_akses',
             'ringkasan_isi' => 'nullable|string',
             'status' => 'required|in:tersimpan,proses,selesai',
             'file_surat' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
@@ -92,7 +94,9 @@ class ArsipSuratController extends Controller
             'pengirim' => $validated['pengirim'],
             'tujuan_penerima' => $validated['tujuan_penerima'],
             'perihal' => $validated['perihal'],
+            'lampiran' => $validated['lampiran'] ?? null,
             'kategori_surat' => $validated['kategori_surat'],
+            'kode_akses' => !empty($validated['kode_akses']) ? strtoupper(trim($validated['kode_akses'])) : null,
             'tahun_kalender' => $tahunKalender,
             'file_surat' => $filePath,
             'ringkasan_isi' => $validated['ringkasan_isi'],
@@ -117,7 +121,9 @@ class ArsipSuratController extends Controller
             'pengirim' => 'required|string|max:150',
             'tujuan_penerima' => 'required|string|max:150',
             'perihal' => 'required|string|max:255',
+            'lampiran' => 'nullable|string|max:100',
             'kategori_surat' => 'required|string|max:50',
+            'kode_akses' => 'nullable|string|max:50|unique:arsip_surat,kode_akses,' . $id,
             'ringkasan_isi' => 'nullable|string',
             'status' => 'required|in:tersimpan,proses,selesai',
             'file_surat' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
@@ -137,7 +143,9 @@ class ArsipSuratController extends Controller
         $surat->pengirim = $validated['pengirim'];
         $surat->tujuan_penerima = $validated['tujuan_penerima'];
         $surat->perihal = $validated['perihal'];
+        $surat->lampiran = $validated['lampiran'] ?? null;
         $surat->kategori_surat = $validated['kategori_surat'];
+        $surat->kode_akses = !empty($validated['kode_akses']) ? strtoupper(trim($validated['kode_akses'])) : null;
         $surat->tahun_kalender = Carbon::parse($validated['tanggal_surat'])->year;
         $surat->ringkasan_isi = $validated['ringkasan_isi'];
         $surat->status = $validated['status'];

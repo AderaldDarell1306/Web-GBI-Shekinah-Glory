@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>@yield('title', 'Admin Dashboard - SIMJ GBI Shekinah Glory')</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo.jpg') }}">
+    <link rel="shortcut icon" href="{{ asset('images/logo.jpg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.jpg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -187,6 +190,13 @@
                     <span class="material-symbols-outlined text-[20px]">diversity_3</span>
                     <span>Kehadiran Komunitas COOL</span>
                 </a>
+
+                <a href="{{ route('admin.ulang-tahun.index') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.ulang-tahun.*') ? 'bg-white/15 text-amber-300 font-bold border-l-4 border-amber-400 pl-3 shadow-xs' : 'text-white/75 hover:bg-white/10 hover:text-white' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[20px]">cake</span>
+                        <span>Ucapan Ulang Tahun</span>
+                    </div>
+                </a>
                 @endif
             </div>
             @else
@@ -212,6 +222,11 @@
                 <a href="{{ route('admin.pelayanan.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.pelayanan.*') ? 'bg-white/15 text-amber-300 font-bold border-l-4 border-amber-400 pl-3 shadow-xs' : 'text-white/75 hover:bg-white/10 hover:text-white' }}">
                     <span class="material-symbols-outlined text-[20px]">assignment_ind</span>
                     <span>Jadwal Pelayan &amp; Rota</span>
+                </a>
+
+                <a href="{{ route('admin.presensi.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.presensi.*') ? 'bg-white/15 text-amber-300 font-bold border-l-4 border-amber-400 pl-3 shadow-xs' : 'text-white/75 hover:bg-white/10 hover:text-white' }}">
+                    <span class="material-symbols-outlined text-[20px]">fact_check</span>
+                    <span>Presensi Pelayan (Mingguan)</span>
                 </a>
 
                 <a href="{{ route('admin.majelis.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium transition {{ request()->routeIs('admin.majelis.*') ? 'bg-white/15 text-amber-300 font-bold border-l-4 border-amber-400 pl-3 shadow-xs' : 'text-white/75 hover:bg-white/10 hover:text-white' }}">

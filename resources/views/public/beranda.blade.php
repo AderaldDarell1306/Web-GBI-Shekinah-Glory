@@ -11,7 +11,7 @@
     <section class="relative min-h-[92vh] sm:min-h-screen w-full flex items-center justify-center -mt-20 pt-28 pb-16 px-4 sm:px-6 lg:px-8 text-white overflow-hidden">
         <!-- Background Interior Gereja Megah dengan Dark Overlay Vignette -->
         <div class="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-1000" 
-             style="background-image: url('{{ $contents['hero_image'] ?? asset('images/gedung_gbi_shekinah_glory.jpg') }}');">
+             style="background-image: url('{{ !empty($contents['hero_image']) ? asset(ltrim($contents['hero_image'], '/')) : asset('images/banner_altar_gbi.jpg') }}');">
         </div>
         <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/90"></div>
 
@@ -149,6 +149,23 @@
                             </li>
                         </ul>
                     </div>
+
+                    <!-- Kartu Nilai-Nilai Inti (Values) Gereja - Warna Senada Visi & Misi di Profil Gereja -->
+                    <div class="sm:col-span-2 p-5 sm:p-6 rounded-2xl bg-amber-50/50 border border-amber-200/70 space-y-3 w-full">
+                        <div class="flex items-center justify-between border-b border-amber-200/70 pb-2.5">
+                            <span class="text-amber-700 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px]">verified</span>
+                                <span>Values</span>
+                            </span>
+                            <a href="{{ route('public.tentang') }}" class="text-[11px] font-semibold text-amber-800 hover:underline flex items-center gap-0.5">
+                                <span>Tentang Kami</span>
+                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                            </a>
+                        </div>
+                        <p class="text-xs sm:text-sm text-primary leading-relaxed sm:leading-loose font-serif-display italic w-full">
+                            " KeTuhanan Kristus, Hubungan terikat janji, Melayani dengan Hati Hamba, Integritas, Sebagai Kepunyaan Tuhan."
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Kartu Gembala Sidang Simpel -->
@@ -168,14 +185,13 @@
             <!-- Kolom Kanan: Foto Sanctuary Tunggal yang Bersih & Megah (5 Cols) -->
             <div class="lg:col-span-5" data-aos="fade-left">
                 <div class="relative rounded-3xl overflow-hidden shadow-xl border border-outline-variant/30 aspect-[4/3] sm:aspect-square group bg-primary">
-                    <img src="{{ $contents['sejarah_image'] ?? asset('images/gedung_gbi_shekinah_glory.jpg') }}" 
+                    <img src="{{ !empty($contents['sejarah_image']) ? asset(ltrim($contents['sejarah_image'], '/')) : asset('images/gedung_gbi_shekinah_glory.jpg') }}" 
                          alt="Gedung GBI Shekinah Glory Namosain" 
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/30 to-transparent"></div>
                     <div class="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-black/45 backdrop-blur-md border border-white/20 text-white space-y-1">
                         <span class="text-2xs font-bold text-amber-300 uppercase tracking-widest block">SEJAK 6 OKTOBER 2000</span>
                         <h4 class="font-serif-display text-base font-bold text-white">Rumah Rohani di Kota Kupang</h4>
-                        <p class="text-2xs text-white/80">"Bangkitlah, menjadi teranglah, sebab terangmu datang, dan kemuliaan TUHAN terbit atasmu." (Yesaya 60:1)</p>
                     </div>
                 </div>
             </div>
@@ -461,12 +477,20 @@
                             <span>Baca Selengkapnya</span>
                             <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </span>
-                        @if($warta->file_pdf)
-                        <span class="text-3xs text-outline font-semibold flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[15px] text-red-500">picture_as_pdf</span>
-                            <span>PDF</span>
-                        </span>
-                        @endif
+                        <div class="flex items-center gap-1.5">
+                            @if($warta->buletin_file || $warta->buletin_link)
+                            <span class="text-3xs text-secondary font-semibold flex items-center gap-1 bg-secondary/10 px-2 py-0.5 rounded-md" title="Tersedia Dokumen / Tautan Buletin">
+                                <span class="material-symbols-outlined text-[13px]">auto_stories</span>
+                                <span>Buletin</span>
+                            </span>
+                            @endif
+                            @if($warta->file_pdf)
+                            <span class="text-3xs text-outline font-semibold flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[15px] text-red-500">picture_as_pdf</span>
+                                <span>PDF</span>
+                            </span>
+                            @endif
+                        </div>
                     </div>
                 </a>
                 @empty
@@ -488,248 +512,122 @@
             <!-- Section Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6" data-aos="fade-up">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-secondary block mb-1">Rangkaian Acara &amp; Jadwal Sepekan</span>
-                    <h2 class="font-serif-display text-3xl sm:text-4xl font-bold text-primary">Agenda Kegiatan Gereja</h2>
+                    <span class="text-xs font-bold uppercase tracking-widest text-secondary block mb-1">✦ Agenda &amp; Syukur Jemaat ✦</span>
+                    <h2 class="font-serif-display text-3xl sm:text-4xl font-bold text-primary">Agenda Mendatang &amp; Ulang Tahun Jemaat</h2>
                     <p class="text-xs sm:text-sm text-on-surface-variant mt-1 max-w-xl">
-                        Jadwal kegiatan persekutuan, kalender acara liturgi sepekan, dan perayaan syukur keluarga jemaat.
+                        Kalender rangkaian acara dan ibadah liturgi mendatang, serta doa perayaan syukur hari ulang tahun keluarga jemaat.
                     </p>
                 </div>
             </div>
 
-            <!-- Content Grid 12 Kolom: Card Agenda Kegiatan di Kiri, Kalender & Ultah di Kanan -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <!-- Sisi Kiri: Card-Card Agenda Kegiatan dengan GAMBAR KONTEN (7 Cols) -->
-                <div class="lg:col-span-7 space-y-5" data-aos="fade-right">
-                    <h3 class="font-serif-display font-bold text-xl text-primary flex items-center gap-2">
-                        <span class="material-symbols-outlined text-secondary">event_note</span>
-                        <span>Agenda Kegiatan Sepekan</span>
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <!-- Card Pengumuman 1: Doa Fajar (Dengan Gambar Konten) -->
-                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/30 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-                            <div>
-                                <div class="relative w-full h-36 bg-surface-container overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1544717302-de2939b7ef71?auto=format&fit=crop&w=600&q=80" 
-                                         alt="Doa Fajar Bersama" 
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                                    <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-blue-600/90 backdrop-blur-md text-white text-3xs font-bold uppercase tracking-wider">
-                                        Doa Syafaat
-                                    </span>
-                                    <span class="absolute bottom-2.5 left-3 text-white text-2xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[14px]">schedule</span>
-                                        <span>Sabtu • 05:00 WITA</span>
-                                    </span>
-                                </div>
-
-                                <div class="p-5 space-y-2">
-                                    <h4 class="font-bold text-sm text-primary group-hover:text-secondary transition-colors">
-                                        Doa Fajar & Mezbah Doa
-                                    </h4>
-                                    <p class="text-xs text-on-surface-variant leading-relaxed">
-                                        Bersehati menaikkan doa permohonan dan ucapan syukur bagi kota, bangsa, serta keluarga jemaat.
-                                    </p>
-                                </div>
+            <!-- Content Grid 2 Kolom: Agenda Mendatang di Kiri, Ulang Tahun di Kanan -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <!-- Kolom Kiri: AGENDA KALENDER & EVENT MENDATANG -->
+                <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-outline-variant/30 space-y-5" data-aos="fade-right">
+                    <div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-primary-container text-secondary flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[22px]">calendar_month</span>
                             </div>
-                            
-                            <div class="px-5 pb-4 pt-2 border-t border-outline-variant/15 flex items-center gap-1.5 text-2xs text-outline">
-                                <span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
-                                <span>Gedung Gereja Namosain</span>
+                            <div>
+                                <h3 class="font-serif-display font-bold text-primary text-xl">Agenda Mendatang</h3>
+                                <p class="text-2xs text-on-surface-variant">Kegiatan ibadah, persekutuan, &amp; acara sepekan</p>
                             </div>
                         </div>
-
-                        <!-- Card Pengumuman 2: Persekutuan Wilayah (Dengan Gambar Konten) -->
-                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/30 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-                            <div>
-                                <div class="relative w-full h-36 bg-surface-container overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80" 
-                                         alt="Persekutuan Wilayah" 
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                                    <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-emerald-600/90 backdrop-blur-md text-white text-3xs font-bold uppercase tracking-wider">
-                                        Wilayah Jemaat
-                                    </span>
-                                    <span class="absolute bottom-2.5 left-3 text-white text-2xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[14px]">calendar_today</span>
-                                        <span>Pertengahan Pekan</span>
-                                    </span>
-                                </div>
-
-                                <div class="p-5 space-y-2">
-                                    <h4 class="font-bold text-sm text-primary group-hover:text-secondary transition-colors">
-                                        Pertemuan Wilayah Jemaat
-                                    </h4>
-                                    <p class="text-xs text-on-surface-variant leading-relaxed">
-                                        Persekutuan keluarga jemaat di 12 sub-wilayah (Namosain, Osmok, Rumah 7). Hubungi ketua wilayah untuk info lokasi.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="px-5 pb-4 pt-2 border-t border-outline-variant/15 flex items-center gap-1.5 text-2xs text-outline">
-                                <span class="material-symbols-outlined text-[14px] text-secondary">groups</span>
-                                <span>12 Sub-Wilayah Pelayanan</span>
-                            </div>
-                        </div>
-
-                        <!-- Card Pengumuman 3: Tim Pujian & Multimedia (Dengan Gambar Konten) -->
-                        <div class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/30 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-                            <div>
-                                <div class="relative w-full h-36 bg-surface-container overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80" 
-                                         alt="Latihan Tim Musik" 
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                                    <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-purple-600/90 backdrop-blur-md text-white text-3xs font-bold uppercase tracking-wider">
-                                        Praise & Worship
-                                    </span>
-                                    <span class="absolute bottom-2.5 left-3 text-white text-2xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[14px]">schedule</span>
-                                        <span>Jumat • 18:00 WITA</span>
-                                    </span>
-                                </div>
-
-                                <div class="p-5 space-y-2">
-                                    <h4 class="font-bold text-sm text-primary group-hover:text-secondary transition-colors">
-                                        Latihan Tim Pujian & Musik
-                                    </h4>
-                                    <p class="text-xs text-on-surface-variant leading-relaxed">
-                                        Persiapan ibadah raya bagi pemusik, singers, worship leader, dan tim multimedia. Harap hadir tepat waktu.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="px-5 pb-4 pt-2 border-t border-outline-variant/15 flex items-center gap-1.5 text-2xs text-outline">
-                                <span class="material-symbols-outlined text-[14px] text-secondary">music_note</span>
-                                <span>Ruang Ibadah Utama</span>
-                            </div>
-                        </div>
-
-                        <!-- Card Pengumuman 4: Sakramen & Warta Sepekan (Dengan Gambar Konten) -->
-                        <a href="{{ route('public.warta') }}" 
-                           class="group bg-white rounded-3xl overflow-hidden border border-outline-variant/30 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-                            <div>
-                                <div class="relative w-full h-36 bg-surface-container overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80" 
-                                         alt="Warta Kegiatan Gereja" 
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                                    <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-amber-600/90 backdrop-blur-md text-white text-3xs font-bold uppercase tracking-wider">
-                                        Warta Lisan
-                                    </span>
-                                    <span class="absolute bottom-2.5 left-3 text-white text-2xs font-semibold flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[14px]">info</span>
-                                        <span>Pekan Berjalan</span>
-                                    </span>
-                                </div>
-
-                                <div class="p-5 space-y-2">
-                                    <h4 class="font-bold text-sm text-primary group-hover:text-secondary transition-colors">
-                                        Warta & Pengumuman Khusus
-                                    </h4>
-                                    <p class="text-xs text-on-surface-variant leading-relaxed line-clamp-2">
-                                        {{ $latestWarta && !empty($latestWarta->pengumuman_kegiatan) ? Str::limit(strip_tags($latestWarta->pengumuman_kegiatan), 110) : 'Informasi baptisan kudus, penyerahan anak, dan pendaftaran keanggotaan jemaat baru.' }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="px-5 pb-4 pt-2 border-t border-outline-variant/15 flex items-center justify-between text-2xs font-bold text-secondary">
-                                <span>Lihat Rincian Warta</span>
-                                <span class="material-symbols-outlined text-[15px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                            </div>
-                        </a>
+                        <span class="text-2xs font-bold text-outline uppercase tracking-wider bg-surface-container px-3 py-1 rounded-full">Liturgi &amp; Acara</span>
                     </div>
-                </div>
 
-                <!-- Sisi Kanan: Agenda Liturgi & Ulang Tahun Jemaat (5 Cols) -->
-                <div class="lg:col-span-5 space-y-6" data-aos="fade-left">
-                    <!-- AGENDA KALENDER GEREJA -->
-                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-outline-variant/30 space-y-4">
-                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-xl bg-primary-container text-secondary flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-                                </div>
-                                <h3 class="font-serif-display font-bold text-primary text-lg">Agenda Mendatang</h3>
+                    @if($upcomingEvents->isNotEmpty())
+                    <div class="divide-y divide-outline-variant/15 space-y-2">
+                        @foreach($upcomingEvents as $evt)
+                        <div class="pt-4 first:pt-0 flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex flex-col items-center justify-center shrink-0 text-primary shadow-2xs">
+                                <span class="text-3xs uppercase tracking-wider font-bold text-secondary leading-none">{{ $evt->tanggal_mulai->translatedFormat('M') }}</span>
+                                <span class="font-serif-display text-lg font-bold leading-tight">{{ $evt->tanggal_mulai->format('d') }}</span>
                             </div>
-                            <span class="text-2xs font-bold text-outline uppercase tracking-wider">Liturgi & Acara</span>
-                        </div>
-
-                        @if($upcomingEvents->isNotEmpty())
-                        <div class="divide-y divide-outline-variant/15 space-y-1">
-                            @foreach($upcomingEvents as $evt)
-                            <div class="pt-3.5 first:pt-0 flex items-start gap-3.5">
-                                <div class="w-12 h-12 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col items-center justify-center shrink-0 text-primary">
-                                    <span class="text-2xs uppercase tracking-wider font-bold text-secondary leading-none">{{ $evt->tanggal_mulai->translatedFormat('M') }}</span>
-                                    <span class="font-serif-display text-base font-bold leading-tight">{{ $evt->tanggal_mulai->format('d') }}</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-2 py-0.5 rounded text-3xs font-bold uppercase tracking-wider {{ $evt->warna_badge_css }}">
-                                            {{ $evt->kategori_label }}
-                                        </span>
-                                        @if($evt->waktu_mulai)
-                                        <span class="text-3xs text-outline font-semibold">{{ substr($evt->waktu_mulai, 0, 5) }} WITA</span>
-                                        @endif
-                                    </div>
-                                    <h4 class="font-bold text-primary text-xs sm:text-sm truncate">{{ $evt->judul }}</h4>
-                                    @if($evt->lokasi)
-                                    <p class="text-2xs text-on-surface-variant flex items-center gap-1 mt-0.5">
-                                        <span class="material-symbols-outlined text-[13px] text-outline">location_on</span>
-                                        <span class="truncate">{{ $evt->lokasi }}</span>
-                                    </p>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded text-3xs font-bold uppercase tracking-wider {{ $evt->warna_badge_css }}">
+                                        {{ $evt->kategori_label }}
+                                    </span>
+                                    @if($evt->waktu_mulai)
+                                    <span class="text-3xs text-outline font-semibold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[13px]">schedule</span>
+                                        <span>{{ substr($evt->waktu_mulai, 0, 5) }} WITA</span>
+                                    </span>
                                     @endif
                                 </div>
+                                <h4 class="font-bold text-primary text-sm sm:text-base leading-snug">{{ $evt->judul }}</h4>
+                                @if($evt->deskripsi)
+                                <p class="text-xs text-on-surface-variant line-clamp-2 mt-1 leading-relaxed">{{ $evt->deskripsi }}</p>
+                                @endif
+                                @if($evt->lokasi)
+                                <p class="text-2xs text-on-surface-variant flex items-center gap-1 mt-1 font-medium">
+                                    <span class="material-symbols-outlined text-[14px] text-secondary">location_on</span>
+                                    <span class="truncate">{{ $evt->lokasi }}</span>
+                                </p>
+                                @endif
                             </div>
-                            @endforeach
                         </div>
-                        @else
-                        <p class="text-xs text-outline text-center py-4">Belum ada agenda khusus yang terjadwal dalam waktu dekat.</p>
-                        @endif
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="p-8 rounded-2xl bg-surface-container-low/60 text-center space-y-2">
+                        <span class="material-symbols-outlined text-outline text-3xl">event_available</span>
+                        <p class="text-xs text-outline font-medium">Belum ada agenda khusus yang terjadwal dalam waktu dekat.</p>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Kolom Kanan: ULANG TAHUN JEMAAT PEKAN INI -->
+                <div class="bg-gradient-to-br from-amber-500/10 via-white to-surface-container-low rounded-3xl p-6 sm:p-7 shadow-sm border border-amber-500/25 space-y-5" data-aos="fade-left">
+                    <div class="flex items-center justify-between border-b border-amber-500/20 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[22px]">cake</span>
+                            </div>
+                            <div>
+                                <h3 class="font-serif-display font-bold text-primary text-xl">Ulang Tahun Jemaat</h3>
+                                <p class="text-2xs text-on-surface-variant">Doa &amp; ucapan syukur hari bahagia</p>
+                            </div>
+                        </div>
+                        <span class="text-2xs font-bold text-amber-900 bg-amber-200/70 px-3 py-1 rounded-full">Pekan Ini</span>
                     </div>
 
-                    <!-- ULANG TAHUN JEMAAT PEKAN INI -->
-                    <div class="bg-gradient-to-br from-amber-500/10 via-white to-surface-container-low rounded-3xl p-6 shadow-sm border border-amber-500/20 space-y-4">
-                        <div class="flex items-center justify-between border-b border-amber-500/15 pb-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-[20px]">cake</span>
-                                </div>
-                                <h3 class="font-serif-display font-bold text-primary text-lg">Ulang Tahun Jemaat</h3>
-                            </div>
-                            <span class="text-2xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Pekan Ini</span>
-                        </div>
-
-                        <p class="text-2xs text-on-surface-variant leading-relaxed italic">
-                            "TUHAN memberkati engkau dan melindungi engkau; TUHAN menyinari engkau dengan wajah-Nya dan memberi engkau kasih karunia." (Bilangan 6:24-25)
-                        </p>
-
-                        @if($ultahMingguIni->isNotEmpty())
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5 max-h-56 overflow-y-auto pr-1">
-                            @foreach($ultahMingguIni as $ultah)
-                            <div onclick="openBirthdayCard('{{ addslashes($ultah->nama_lengkap) }}', '{{ $ultah->umur_ke ?? '' }}', '{{ \Carbon\Carbon::parse($ultah->tanggal_lahir)->translatedFormat('d F') }}', '{{ $ultah->jenis_kelamin }}')" 
-                                 class="p-2.5 rounded-xl bg-white/95 border border-amber-500/15 flex items-center justify-between gap-3 shadow-2xs cursor-pointer hover:border-amber-400 hover:shadow-xs transition-all group"
-                                 title="Klik untuk membuka & download kartu ucapan pribadi">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-1">
-                                        <span class="font-bold text-xs text-primary group-hover:text-secondary transition truncate block">{{ $ultah->nama_lengkap }}</span>
-                                        <span class="material-symbols-outlined text-[13px] text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">download</span>
-                                    </div>
-                                    <span class="text-2xs text-outline">{{ $ultah->wilayah->nama_wilayah ?? 'Keluarga Jemaat' }}</span>
-                                </div>
-                                <span class="px-2 py-1 rounded-lg bg-amber-50 text-amber-900 font-bold text-2xs whitespace-nowrap border border-amber-200/50 shrink-0">
-                                    {{ \Carbon\Carbon::parse($ultah->tanggal_lahir)->translatedFormat('d F') }}
-                                </span>
-                            </div>
-                            @endforeach
-                        </div>
-                        <p class="text-[10px] text-center text-amber-800 font-medium pt-1">* Klik nama jemaat untuk unduh kartu ucapan pribadi</p>
-                        @else
-                        <div class="p-4 rounded-xl bg-white/70 text-center text-xs text-outline">
-                            Tidak ada jemaat yang berulang tahun pada pekan ini.
-                        </div>
-                        @endif
+                    <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/50 text-2xs text-amber-950 leading-relaxed italic flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-amber-600 text-lg shrink-0">format_quote</span>
+                        <span>"TUHAN memberkati engkau dan melindungi engkau; TUHAN menyinari engkau dengan wajah-Nya dan memberi engkau kasih karunia." (Bilangan 6:24-25)</span>
                     </div>
+
+                    @if($ultahMingguIni->isNotEmpty())
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                        @foreach($ultahMingguIni as $ultah)
+                        <div onclick="openBirthdayCard('{{ addslashes($ultah->nama_lengkap) }}', '{{ $ultah->umur_ke ?? '' }}', '{{ \Carbon\Carbon::parse($ultah->tanggal_lahir)->translatedFormat('d F') }}', '{{ $ultah->jenis_kelamin }}', '{{ addslashes($ultah->ucapan_ultah ?? '') }}')" 
+                             class="p-3 rounded-2xl bg-white border border-amber-500/20 flex items-center justify-between gap-3 shadow-2xs cursor-pointer hover:border-amber-400 hover:shadow-xs transition-all group"
+                             title="Klik untuk membuka & download kartu ucapan pribadi">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-xs text-primary group-hover:text-secondary transition truncate block">{{ $ultah->nama_lengkap }}</span>
+                                    <span class="material-symbols-outlined text-[14px] text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">download</span>
+                                </div>
+                                <span class="text-2xs text-outline">{{ $ultah->wilayah->nama_wilayah ?? 'Keluarga Jemaat' }}</span>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-100/70 text-amber-900 font-bold text-2xs whitespace-nowrap border border-amber-300/40 shrink-0">
+                                {{ \Carbon\Carbon::parse($ultah->tanggal_lahir)->translatedFormat('d F') }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+                    <p class="text-[11px] text-center text-amber-900/80 font-medium pt-1 flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">touch_app</span>
+                        <span>Klik nama jemaat untuk mengunduh kartu ucapan pribadi</span>
+                    </p>
+                    @else
+                    <div class="p-8 rounded-2xl bg-white/80 text-center space-y-2 border border-amber-500/10">
+                        <span class="material-symbols-outlined text-amber-500/70 text-3xl">sentiment_satisfied</span>
+                        <p class="text-xs text-outline font-medium">Tidak ada jemaat yang berulang tahun pada pekan ini.</p>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -910,14 +808,13 @@
                 </div>
             </div>
 
-            <p class="text-xs sm:text-sm text-secondary-fixed font-serif italic leading-relaxed px-2">
-                "TUHAN memberkati engkau dan melindungi engkau; TUHAN menyinari engkau dengan wajah-Nya dan memberi engkau kasih karunia; TUHAN menghadapkan wajah-Nya kepadamu dan memberi engkau damai sejahtera."
+            <p class="text-xs sm:text-sm text-[#ffdea5] font-serif italic leading-relaxed px-2 whitespace-pre-line" id="cardBlessingText">
+                "TUHAN memberkati engkau dan melindungi engkau; TUHAN menyinari engkau dengan wajah-Nya dan memberi engkau kasih karunia; TUHAN menghadapkan wajah-Nya kepadamu dan memberi engkau damai sejahtera." (Bilangan 6:24-26)
             </p>
-            <span class="text-2xs text-white/70 block font-sans font-semibold">(Bilangan 6:24-26)</span>
 
             <div class="pt-2 text-2xs text-white/60 border-t border-white/10">
                 Kiranya hikmat, kesehatan, sukacita, dan penyertaan Tuhan senantiasa melimpah.<br>
-                <strong>— Gembala Sidang & Majelis GBI Shekinah Glory</strong>
+                <strong>— Gembala Sidang &amp; Majelis GBI Shekinah Glory</strong>
             </div>
         </div>
 
@@ -938,21 +835,44 @@
 </div>
 
 <script>
-let currentBirthdayData = { name: '', age: '', day: '', gender: '' };
+let currentBirthdayData = { name: '', age: '', day: '', gender: '', message: '' };
 
-function openBirthdayCard(name, age, day, gender) {
-    currentBirthdayData = { name, age, day, gender };
+function openBirthdayCard(name, age, day, gender, customUcapan) {
+    const defaultVerse = '"TUHAN memberkati engkau dan melindungi engkau; TUHAN menyinari engkau dengan wajah-Nya dan memberi engkau kasih karunia; TUHAN menghadapkan wajah-Nya kepadamu dan memberi engkau damai sejahtera." (Bilangan 6:24-26)';
+    
+    const message = customUcapan && customUcapan.trim() !== '' ? customUcapan.trim() : defaultVerse;
+    currentBirthdayData = { name, age, day, gender, message };
     
     const salutation = gender === 'L' ? 'Bapak / Saudara' : 'Ibu / Saudari';
     document.getElementById('cardSalutation').textContent = `Kepada yang Terkasih ${salutation}:`;
     document.getElementById('cardPersonName').textContent = name;
     document.getElementById('cardAgeBadge').textContent = age ? `HUT ke-${age} Tahun (${day})` : `Hari Ulang Tahun (${day})`;
+    document.getElementById('cardBlessingText').textContent = message;
 
     document.getElementById('birthdayCardModal').classList.remove('hidden');
 }
 
 function closeBirthdayCard() {
     document.getElementById('birthdayCardModal').classList.add('hidden');
+}
+
+function wrapText(context, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let curY = y;
+    for(let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = context.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+            context.fillText(line.trim(), x, curY);
+            line = words[n] + ' ';
+            curY += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+    context.fillText(line.trim(), x, curY);
 }
 
 function downloadBirthdayCard() {
@@ -1016,7 +936,7 @@ function downloadBirthdayCard() {
     ctx.fillText(badgeText, w / 2, 488);
 
     // Scripture Verse Box
-    ctx.fillStyle = 'rgba(0, 20, 40, 0.4)';
+    ctx.fillStyle = 'rgba(0, 20, 40, 0.45)';
     ctx.beginPath();
     ctx.roundRect(100, 560, w - 200, 310, 24);
     ctx.fill();
@@ -1024,16 +944,8 @@ function downloadBirthdayCard() {
     ctx.stroke();
 
     ctx.fillStyle = '#ffdea5';
-    ctx.font = 'italic 30px serif';
-    ctx.fillText('"TUHAN memberkati engkau dan melindungi engkau;', w / 2, 630);
-    ctx.fillText('TUHAN menyinari engkau dengan wajah-Nya', w / 2, 680);
-    ctx.fillText('dan memberi engkau kasih karunia;', w / 2, 730);
-    ctx.fillText('TUHAN menghadapkan wajah-Nya kepadamu', w / 2, 780);
-    ctx.fillText('dan memberi engkau damai sejahtera."', w / 2, 830);
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText('— Bilangan 6:24-26 —', w / 2, 890);
+    ctx.font = 'italic 28px serif';
+    wrapText(ctx, currentBirthdayData.message, w / 2, 640, w - 260, 44);
 
     // Footer
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';

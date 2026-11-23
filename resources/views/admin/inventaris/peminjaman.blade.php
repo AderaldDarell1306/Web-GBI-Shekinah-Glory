@@ -101,6 +101,7 @@
                         </td>
                         <td class="py-3 px-4 text-center">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-2xs font-bold
+                                {{ $p->status === 'Menunggu Konfirmasi' ? 'bg-amber-100 text-amber-800' : '' }}
                                 {{ $p->status === 'Sedang Dipinjam' ? 'bg-blue-100 text-blue-800' : '' }}
                                 {{ $p->status === 'Sudah Dikembalikan' ? 'bg-emerald-100 text-emerald-800' : '' }}
                                 {{ $p->status === 'Terlambat' ? 'bg-rose-100 text-rose-800' : '' }}">
@@ -109,6 +110,10 @@
                         </td>
                         <td class="py-3 px-4 text-center whitespace-nowrap">
                             <div class="inline-flex items-center gap-1">
+                                <a href="{{ route('public.layanan.pinjam-inventaris.sukses', $p->id) }}" target="_blank" class="px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-bold text-2xs transition flex items-center gap-1" title="Cetak Blanko Peminjaman (A4)">
+                                    <span class="material-symbols-outlined text-[14px]">print</span>
+                                    <span>Blanko A4</span>
+                                </a>
                                 @if($p->status !== 'Sudah Dikembalikan')
                                 <button type="button" onclick='openReturnModal(@json($p))' class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-2xs transition shadow-xs flex items-center gap-1">
                                     <span class="material-symbols-outlined text-[14px]">check</span>

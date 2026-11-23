@@ -55,54 +55,139 @@
                     </div>
                 </div>
 
-                <!-- PILIH KEPALA KELUARGA (TAMBAH ANGGOTA KE KK YANG ADA - PRD v2.1) -->
-                <div class="p-4 rounded-2xl bg-secondary/5 border border-secondary/20 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-primary flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px] text-secondary">family_restroom</span>
-                            <span>Tambah Anggota ke KK yang Sudah Ada (Pilih / Cari Kepala Keluarga)</span>
+                <!-- GENERATOR OTOMATIS & ANTI-DUPLIKASI NOMOR KK -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 border border-secondary/30 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/20 pb-3">
+                        <label class="text-xs font-bold text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary text-[20px]">auto_fix_high</span>
+                            <span>Mode Pembuatan Nomor KK / ID Jemaat (Otomatis &amp; Anti-Dobel)</span>
                         </label>
-                        <span class="text-2xs bg-secondary-container text-secondary font-bold px-2 py-0.5 rounded-full">Fitur Tambah Anggota KK</span>
+                        <span class="text-3xs bg-secondary-container text-secondary font-bold px-3 py-1 rounded-full uppercase tracking-wider">Otomasi Standar Gereja</span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                        <div class="md:col-span-8">
-                            <input type="text" id="cari_kk_input" list="kkDatalist" placeholder="Ketik nama Kepala Keluarga atau No. KK untuk mencari..." class="w-full px-3.5 py-2.5 rounded-xl border border-secondary/40 text-xs focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none bg-white">
-                            <datalist id="kkDatalist">
-                                @if(isset($kepalaKeluargaList))
-                                    @foreach($kepalaKeluargaList as $kk)
-                                        <option value="{{ $kk->nama_lengkap }} (KK: {{ $kk->no_kk }})" data-kk="{{ $kk->no_kk }}" data-wilayah="{{ $kk->wilayah_id }}" data-alamat="{{ $kk->alamat }}" data-nama="{{ $kk->nama_lengkap }}">
-                                    @endforeach
-                                @endif
-                            </datalist>
+                    <!-- 2 Pilihan Mode: KK Baru vs Tambah Anggota ke KK Ada -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Opsi 1: Kepala Keluarga Baru -->
+                        <div id="btn_mode_baru" onclick="setKkMode('baru')" class="cursor-pointer border-2 border-secondary bg-white rounded-2xl p-3.5 flex items-start gap-3 transition shadow-xs">
+                            <input type="radio" name="mode_kk_radio" id="radio_mode_baru" checked class="mt-0.5 text-secondary focus:ring-secondary pointer-events-none">
+                            <div class="flex-1">
+                                <span class="text-xs font-bold text-primary flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px] text-emerald-600">add_home</span>
+                                    <span>1. Kepala Keluarga Baru (KK Baru)</span>
+                                </span>
+                                <span class="text-3xs text-on-surface-variant block mt-0.5 leading-relaxed">
+                                    Nomor KK baru otomatis dihasilkan dari Wilayah yang dipilih. Menghindari nomor loncat atau tertukar antar wilayah.
+                                </span>
+                            </div>
                         </div>
-                        <div class="md:col-span-4 flex items-center gap-2">
-                            <button type="button" id="btn_apply_kk" class="w-full py-2.5 px-4 bg-secondary text-white font-bold text-xs rounded-xl hover:bg-secondary/90 transition shadow-sm flex items-center justify-center gap-1.5">
-                                <span class="material-symbols-outlined text-[16px]">check_circle</span>
-                                <span>Terapkan ke KK Ini</span>
-                            </button>
-                            <button type="button" id="btn_reset_kk" class="py-2.5 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition" title="Batal / Buat KK Baru">
-                                Reset
-                            </button>
+
+                        <!-- Opsi 2: Anggota Keluarga Tambahan -->
+                        <div id="btn_mode_gabung" onclick="setKkMode('gabung')" class="cursor-pointer border-2 border-outline-variant/30 bg-surface-container-lowest rounded-2xl p-3.5 flex items-start gap-3 transition hover:border-secondary/50">
+                            <input type="radio" name="mode_kk_radio" id="radio_mode_gabung" class="mt-0.5 text-secondary focus:ring-secondary pointer-events-none">
+                            <div class="flex-1">
+                                <span class="text-xs font-bold text-primary flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px] text-blue-600">group_add</span>
+                                    <span>2. Anggota Keluarga Tambahan (KK Ada)</span>
+                                </span>
+                                <span class="text-3xs text-on-surface-variant block mt-0.5 leading-relaxed">
+                                    Pilih Kepala Keluarga yang sudah terdaftar. Sistem otomatis mengisi nomor urut anggota berikutnya (02, 03, dst).
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div id="kk_selected_info" class="hidden text-xs text-secondary-dark bg-secondary/10 p-2.5 rounded-lg border border-secondary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[18px] text-secondary">check</span>
-                            <span>Kepala Keluarga: <strong id="info_nama_kk"></strong> • Kode KK: <code id="info_kode_kk" class="font-bold"></code> • Urutan Anggota Berikutnya: <code id="info_next_seq" class="font-bold text-primary"></code></span>
+
+                    <!-- Input / Kontrol Mode 1: Pilih Wilayah untuk KK Baru -->
+                    <div id="control_mode_baru" class="space-y-2 pt-2 border-t border-outline-variant/20">
+                        <label class="block text-2xs font-bold uppercase text-primary tracking-wider">
+                            Pilih Wilayah / Sektor Pelayanan untuk Generate No. KK Baru:
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                            <div class="md:col-span-8">
+                                <select id="select_wilayah_generator" class="w-full px-3.5 py-2.5 rounded-xl border border-secondary/40 text-xs focus:border-secondary bg-white">
+                                    <option value="">-- Pilih Wilayah untuk Nomor KK Otomatis --</option>
+                                    @php
+                                        $groupedWilayah = $wilayahList->groupBy('wilayah_besar');
+                                    @endphp
+                                    @foreach($groupedWilayah as $wb => $wList)
+                                    <optgroup label="Wilayah Besar: {{ $wb }}">
+                                        @foreach($wList as $w)
+                                        <option value="{{ $w->id }}" data-prefix="{{ $w->kode_prefix }}">
+                                            [{{ $w->kode_prefix }}] {{ $w->nama_wilayah }} (Next KK: {{ $nextKKByWilayah[$w->id] ?? '-' }})
+                                        </option>
+                                        @endforeach
+                                    </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="md:col-span-4">
+                                <button type="button" onclick="generateNewKKFromSelectedWilayah()" class="w-full py-2.5 px-4 bg-emerald-700 text-white font-bold text-xs rounded-xl hover:bg-emerald-800 transition shadow-sm flex items-center justify-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">refresh</span>
+                                    <span>Buat No. KK Baru</span>
+                                </button>
+                            </div>
                         </div>
-                        <span class="text-2xs text-outline">* Nomor KK & Wilayah otomatis terisi di formulir</span>
+                    </div>
+
+                    <!-- Input / Kontrol Mode 2: Cari Kepala Keluarga untuk Tambah Anggota -->
+                    <div id="control_mode_gabung" class="hidden space-y-2 pt-2 border-t border-outline-variant/20">
+                        <label class="block text-2xs font-bold uppercase text-primary tracking-wider">
+                            Cari Kepala Keluarga / Nomor KK yang Sudah Terdaftar:
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                            <div class="md:col-span-8">
+                                <input type="text" id="cari_kk_input" list="kkDatalist" placeholder="Ketik nama Kepala Keluarga atau No. KK untuk mencari..." class="w-full px-3.5 py-2.5 rounded-xl border border-secondary/40 text-xs focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none bg-white">
+                                <datalist id="kkDatalist">
+                                    @if(isset($kepalaKeluargaList))
+                                        @foreach($kepalaKeluargaList as $kk)
+                                            <option value="{{ $kk->nama_lengkap }} (KK: {{ $kk->no_kk }})" data-kk="{{ $kk->no_kk }}" data-wilayah="{{ $kk->wilayah_id }}" data-alamat="{{ $kk->alamat }}" data-nama="{{ $kk->nama_lengkap }}">
+                                        @endforeach
+                                    @endif
+                                </datalist>
+                            </div>
+                            <div class="md:col-span-4 flex items-center gap-2">
+                                <button type="button" id="btn_apply_kk" class="w-full py-2.5 px-4 bg-secondary text-white font-bold text-xs rounded-xl hover:bg-secondary/90 transition shadow-sm flex items-center justify-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                    <span>Terapkan KK</span>
+                                </button>
+                                <button type="button" id="btn_reset_kk" class="py-2.5 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition" title="Batal / Reset">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                        <div id="kk_selected_info" class="hidden text-xs text-secondary-dark bg-secondary/10 p-2.5 rounded-lg border border-secondary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-secondary">check</span>
+                                <span>Kepala Keluarga: <strong id="info_nama_kk"></strong> • Kode KK: <code id="info_kode_kk" class="font-bold"></code> • No. Anggota Berikutnya: <code id="info_next_seq" class="font-bold text-primary"></code></span>
+                            </div>
+                            <span class="text-2xs text-outline">* No. KK, Wilayah, &amp; Alamat otomatis tersinkron</span>
+                        </div>
+                    </div>
+
+                    <!-- Banner Status Otomasi -->
+                    <div id="kk_status_badge" class="p-3 rounded-xl bg-white border border-outline-variant/30 text-xs text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary text-[18px]">info</span>
+                        <span id="kk_status_text">Pilih opsi di atas untuk mengisi No. KK secara otomatis dan aman tanpa duplikasi.</span>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <!-- KK (Kode / Nomor KK) -->
                     <div class="md:col-span-4 space-y-1">
-                        <label for="no_kk" class="block text-xs font-bold text-primary">No. KK / ID Jemaat (6 Digit)</label>
+                        <label for="no_kk" class="block text-xs font-bold text-primary flex items-center justify-between">
+                            <span>No. KK / ID Jemaat (6 Digit) <span class="text-red-500">*</span></span>
+                            <span id="no_kk_badge_status" class="text-3xs font-semibold text-outline">Format 6 Digit</span>
+                        </label>
                         <div class="relative flex items-center">
                             <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">family_restroom</span>
-                            <input type="text" name="no_kk" id="no_kk" value="{{ old('no_kk') }}" placeholder="Contoh: 310101" maxlength="20" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-outline-variant/60 text-xs focus:border-secondary focus:outline-none transition font-mono font-bold tracking-wider">
+                            <input type="text" name="no_kk" id="no_kk" required value="{{ old('no_kk') }}" placeholder="Contoh: 310101" maxlength="20" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-outline-variant/60 text-xs focus:border-secondary focus:outline-none transition font-mono font-bold tracking-wider">
                         </div>
+                        <div id="kk_duplicate_alert" class="hidden p-2 rounded-lg bg-red-100 text-red-800 border border-red-300 text-2xs font-semibold"></div>
+                        @error('no_kk')
+                        <div class="p-2 rounded-lg bg-red-100 text-red-800 border border-red-300 text-2xs font-semibold flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[15px] text-red-600">error</span>
+                            <span>{{ $message }}</span>
+                        </div>
+                        @enderror
                         <span class="text-[10px] text-outline block leading-tight">
                             Format 6 Digit: <strong>[2 digit Wilayah][2 digit No. KK][2 digit Anggota]</strong><br>
                             Contoh: <code>310101</code> = Osmok Sub 1, KK 01, Urutan 01.
@@ -328,9 +413,158 @@
 </div>
 
 <script>
+// Data dari Backend Controller
+const nextKKByWilayah = @json($nextKKByWilayah ?? []);
+const existingKKs = @json($existingKKs ?? []);
+const maxSeqMap = @json($maxSeqByPrefix ?? []);
+
+let currentKkMode = 'baru';
+
+// Mode Switcher: 'baru' (Kepala Keluarga Baru) atau 'gabung' (Anggota Keluarga Tambahan)
+window.setKkMode = function(mode) {
+    currentKkMode = mode;
+    const btnBaru = document.getElementById('btn_mode_baru');
+    const btnGabung = document.getElementById('btn_mode_gabung');
+    const radioBaru = document.getElementById('radio_mode_baru');
+    const radioGabung = document.getElementById('radio_mode_gabung');
+    const controlBaru = document.getElementById('control_mode_baru');
+    const controlGabung = document.getElementById('control_mode_gabung');
+    const statusText = document.getElementById('kk_status_text');
+
+    if (mode === 'baru') {
+        if (radioBaru) radioBaru.checked = true;
+        if (radioGabung) radioGabung.checked = false;
+
+        btnBaru?.classList.remove('border-outline-variant/30', 'bg-surface-container-lowest');
+        btnBaru?.classList.add('border-secondary', 'bg-white', 'shadow-xs');
+
+        btnGabung?.classList.remove('border-secondary', 'bg-white', 'shadow-xs');
+        btnGabung?.classList.add('border-outline-variant/30', 'bg-surface-container-lowest');
+
+        controlBaru?.classList.remove('hidden');
+        controlGabung?.classList.add('hidden');
+
+        if (statusText) {
+            statusText.innerHTML = 'Mode Aktif: <strong>Kepala Keluarga Baru (KK Baru)</strong>. Pilih Wilayah di atas untuk otomatis membuat Nomor KK keluarga baru berikutnya.';
+        }
+
+        const selWilayah = document.getElementById('select_wilayah_generator');
+        if (selWilayah && selWilayah.value) {
+            generateNewKKFromSelectedWilayah();
+        }
+    } else {
+        if (radioBaru) radioBaru.checked = false;
+        if (radioGabung) radioGabung.checked = true;
+
+        btnGabung?.classList.remove('border-outline-variant/30', 'bg-surface-container-lowest');
+        btnGabung?.classList.add('border-secondary', 'bg-white', 'shadow-xs');
+
+        btnBaru?.classList.remove('border-secondary', 'bg-white', 'shadow-xs');
+        btnBaru?.classList.add('border-outline-variant/30', 'bg-surface-container-lowest');
+
+        controlGabung?.classList.remove('hidden');
+        controlBaru?.classList.add('hidden');
+
+        if (statusText) {
+            statusText.innerHTML = 'Mode Aktif: <strong>Anggota Keluarga Tambahan (KK Ada)</strong>. Cari nama Kepala Keluarga atau No. KK untuk otomatis mengisi urutan anggota berikutnya.';
+        }
+    }
+};
+
+// Generator No KK Baru dari Wilayah
+window.generateNewKKFromSelectedWilayah = function() {
+    const sel = document.getElementById('select_wilayah_generator');
+    const noKkInput = document.getElementById('no_kk');
+    const wilayahSelect = document.getElementById('wilayah_id');
+    const statusKeluargaInput = document.getElementById('status_keluarga');
+    const statusText = document.getElementById('kk_status_text');
+
+    if (!sel || !sel.value) {
+        alert('Silakan pilih salah satu Wilayah / Sektor Pelayanan terlebih dahulu.');
+        sel?.focus();
+        return;
+    }
+
+    const wilayahId = sel.value;
+    const nextKK = nextKKByWilayah[wilayahId];
+
+    if (nextKK) {
+        if (noKkInput) {
+            noKkInput.value = nextKK;
+        }
+
+        // Sinkronkan dropdown wilayah pada form utama
+        if (wilayahSelect) {
+            wilayahSelect.value = wilayahId;
+        }
+
+        // Default status keluarga untuk KK baru: BAPAK (KEPALA KELUARGA)
+        if (statusKeluargaInput && (!statusKeluargaInput.value || statusKeluargaInput.value === 'ANAK')) {
+            statusKeluargaInput.value = 'BAPAK (KEPALA KELUARGA)';
+        }
+
+        const wilayahText = sel.options[sel.selectedIndex]?.text || '';
+        if (statusText) {
+            statusText.innerHTML = '<span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span> <span><strong class="text-emerald-700">Nomor KK Baru Dihasilkan:</strong> <span class="font-mono font-bold text-secondary text-sm">' + nextKK + '</span> (' + wilayahText + '). Bebas dari duplikasi.</span></span>';
+        }
+
+        checkDuplicateKK(nextKK);
+    } else {
+        alert('Gagal menghitung Nomor KK untuk wilayah yang dipilih.');
+    }
+};
+
+// Fungsi Cek Duplikasi Real-Time
+function checkDuplicateKK(val) {
+    const noKkInput = document.getElementById('no_kk');
+    const alertBox = document.getElementById('kk_duplicate_alert');
+    const badgeStatus = document.getElementById('no_kk_badge_status');
+
+    if (!val) {
+        if (alertBox) alertBox.classList.add('hidden');
+        if (badgeStatus) badgeStatus.innerHTML = '<span class="text-outline">Format 6 Digit</span>';
+        noKkInput?.classList.remove('border-red-500', 'bg-red-50/50', 'text-red-900', 'ring-1', 'ring-red-500', 'border-emerald-500', 'bg-emerald-50/30', 'text-emerald-900', 'ring-emerald-500');
+        return false;
+    }
+
+    const cleanVal = String(val).trim();
+
+    if (existingKKs[cleanVal]) {
+        const ownerName = existingKKs[cleanVal];
+        if (alertBox) {
+            alertBox.innerHTML = '<div class="flex items-start gap-1.5"><span class="material-symbols-outlined text-red-600 text-[18px]">error</span><div><strong>PERINGATAN DUPLIKAT:</strong> Nomor KK / ID Jemaat <code>' + cleanVal + '</code> sudah terdaftar atas nama <strong>' + ownerName + '</strong>. Mohon gunakan nomor urut berikutnya agar tidak terjadi pendobelan data!</div></div>';
+            alertBox.classList.remove('hidden');
+        }
+        if (badgeStatus) {
+            badgeStatus.innerHTML = '<span class="text-red-600 font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">warning</span> Terdaftar: ' + ownerName + '</span>';
+        }
+        if (noKkInput) {
+            noKkInput.classList.remove('border-emerald-500', 'bg-emerald-50/30', 'text-emerald-900', 'ring-emerald-500');
+            noKkInput.classList.add('border-red-500', 'bg-red-50/50', 'text-red-900', 'ring-1', 'ring-red-500');
+        }
+        return true;
+    } else if (cleanVal.length >= 6) {
+        if (alertBox) alertBox.classList.add('hidden');
+        if (badgeStatus) {
+            badgeStatus.innerHTML = '<span class="text-emerald-700 font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">check_circle</span> Nomor Unik &amp; Tersedia</span>';
+        }
+        if (noKkInput) {
+            noKkInput.classList.remove('border-red-500', 'bg-red-50/50', 'text-red-900', 'ring-1', 'ring-red-500');
+            noKkInput.classList.add('border-emerald-500', 'bg-emerald-50/30', 'text-emerald-900', 'ring-1', 'ring-emerald-500');
+        }
+        return false;
+    } else {
+        if (alertBox) alertBox.classList.add('hidden');
+        if (badgeStatus) badgeStatus.innerHTML = '<span class="text-outline">Format 6 Digit (' + cleanVal.length + '/6)</span>';
+        noKkInput?.classList.remove('border-red-500', 'bg-red-50/50', 'text-red-900', 'ring-1', 'ring-red-500', 'border-emerald-500', 'bg-emerald-50/30', 'text-emerald-900', 'ring-emerald-500');
+        return false;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const noKkInput = document.getElementById('no_kk');
     const wilayahSelect = document.getElementById('wilayah_id');
+    const selectWilayahGen = document.getElementById('select_wilayah_generator');
     const cariKkInput = document.getElementById('cari_kk_input');
     const btnApply = document.getElementById('btn_apply_kk');
     const btnReset = document.getElementById('btn_reset_kk');
@@ -340,12 +574,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const infoNext = document.getElementById('info_next_seq');
     const statusKeluargaInput = document.getElementById('status_keluarga');
     const alamatInput = document.getElementById('alamat');
+    const statusText = document.getElementById('kk_status_text');
 
-    const maxSeqMap = @json($maxSeqByPrefix ?? []);
+    // Auto-generate saat wilayah di generator dipilih
+    selectWilayahGen?.addEventListener('change', function() {
+        if (this.value) {
+            generateNewKKFromSelectedWilayah();
+        }
+    });
 
-    // Sync Wilayah from 2-digit KK
+    // Validasi input No KK manual & sinkronisasi Wilayah dari 2 digit prefix
     noKkInput?.addEventListener('input', function() {
         const val = this.value.trim();
+        checkDuplicateKK(val);
+
         if (val.length >= 2) {
             const prefix = val.substring(0, 2);
             for (let i = 0; i < wilayahSelect.options.length; i++) {
@@ -357,6 +599,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Jika dropdown wilayah utama diubah saat mode baru, sinkronkan ke generator
+    wilayahSelect?.addEventListener('change', function() {
+        if (currentKkMode === 'baru' && this.value) {
+            if (selectWilayahGen) {
+                selectWilayahGen.value = this.value;
+                generateNewKKFromSelectedWilayah();
+            }
+        }
+    });
+
+    // Terapkan Kepala Keluarga yang dipilih pada Mode Tambah Anggota
     function applySelectedKk() {
         const val = cariKkInput.value.trim();
         if (!val) return;
@@ -390,7 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const wilayahId = matched.getAttribute('data-wilayah') || '';
             const alamat = matched.getAttribute('data-alamat') || '';
 
-            // 4 digit awal KK
+            // 4 digit awal KK (Prefix Wilayah + Urutan Keluarga)
             const prefix4 = rawKk.substring(0, 4);
             const currentMax = maxSeqMap[prefix4] ? parseInt(maxSeqMap[prefix4]) : (rawKk.length >= 6 ? parseInt(rawKk.substring(4, 6)) : 1);
             const nextSeqNum = currentMax + 1;
@@ -400,8 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Isi No KK dengan nomor anggota keluarga berikutnya
             if (noKkInput) {
                 noKkInput.value = newKk;
-                // Trigger input event to update wilayah
-                noKkInput.dispatchEvent(new Event('input'));
+                checkDuplicateKK(newKk);
             }
 
             // Set Wilayah jika ada
@@ -415,7 +667,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Sugesti status keluarga
-            if (statusKeluargaInput && !statusKeluargaInput.value) {
+            if (statusKeluargaInput && (!statusKeluargaInput.value || statusKeluargaInput.value.includes('KEPALA'))) {
                 statusKeluargaInput.value = 'ANAK';
             }
 
@@ -424,6 +676,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (infoKode) infoKode.textContent = prefix4 + ' (Kepala: ' + rawKk + ')';
             if (infoNext) infoNext.textContent = newKk;
             if (kkInfoBox) kkInfoBox.classList.remove('hidden');
+
+            if (statusText) {
+                statusText.innerHTML = '<span class="inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span> <span>Terhubung ke KK <strong class="text-primary">' + nama + '</strong>: No. Anggota Berikutnya <span class="font-mono font-bold text-secondary text-sm">' + newKk + '</span>. Wilayah &amp; Alamat otomatis tersinkron.</span></span>';
+            }
         } else {
             alert('Kepala Keluarga tidak ditemukan. Pastikan Anda memilih dari daftar opsi yang tersedia.');
         }
@@ -435,7 +691,28 @@ document.addEventListener('DOMContentLoaded', function() {
     btnReset?.addEventListener('click', function() {
         if (cariKkInput) cariKkInput.value = '';
         if (kkInfoBox) kkInfoBox.classList.add('hidden');
-        if (noKkInput) noKkInput.value = '';
+        if (noKkInput) {
+            noKkInput.value = '';
+            checkDuplicateKK('');
+        }
+    });
+
+    // Initial check jika ada nilai lama dari old('no_kk')
+    if (noKkInput && noKkInput.value) {
+        checkDuplicateKK(noKkInput.value);
+    }
+
+    // Cegah submit form jika No KK masih duplikat
+    const jemaatForm = document.querySelector('form[action*="jemaat"]');
+    jemaatForm?.addEventListener('submit', function(e) {
+        if (noKkInput && noKkInput.value) {
+            const isDupe = checkDuplicateKK(noKkInput.value);
+            if (isDupe) {
+                e.preventDefault();
+                alert('Perhatian: Nomor KK/ID Jemaat ' + noKkInput.value + ' sudah terdaftar atas nama ' + (existingKKs[noKkInput.value] || 'jemaat lain') + '. Silakan gunakan nomor urut yang unik agar tidak terjadi pendobelan data.');
+                noKkInput.focus();
+            }
+        }
     });
 });
 </script>

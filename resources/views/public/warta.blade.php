@@ -40,10 +40,22 @@
                     </div>
                 @endif
 
+                @if($warta->buletin_file)
+                    <a href="{{ asset('storage/' . $warta->buletin_file) }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-secondary rounded-xl hover:bg-secondary/90 transition shadow-xs">
+                        <span class="material-symbols-outlined text-base">auto_stories</span>
+                        <span>Unduh Buletin ({{ strtoupper(pathinfo($warta->buletin_file, PATHINFO_EXTENSION)) }})</span>
+                    </a>
+                @elseif($warta->buletin_link)
+                    <a href="{{ $warta->buletin_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-secondary rounded-xl hover:bg-secondary/90 transition shadow-xs">
+                        <span class="material-symbols-outlined text-base">menu_book</span>
+                        <span>Baca Buletin Online</span>
+                    </a>
+                @endif
+
                 @if($warta->file_pdf)
                     <a href="{{ asset('storage/' . $warta->file_pdf) }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-primary rounded-xl hover:bg-primary-dark transition shadow-xs">
                         <span class="material-symbols-outlined text-base">download</span>
-                        Unduh PDF
+                        <span>Unduh PDF</span>
                     </a>
                 @endif
             </div>
@@ -100,19 +112,26 @@
                         </div>
 
                         @if($warta->buletin_tipe === 'upload' && $warta->buletin_file)
+                            @php
+                                $ext = strtolower(pathinfo($warta->buletin_file, PATHINFO_EXTENSION));
+                            @endphp
                             <div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center font-bold">
-                                        <span class="material-symbols-outlined text-[24px]">picture_as_pdf</span>
+                                        <span class="material-symbols-outlined text-[24px]">
+                                            {{ $ext === 'pub' ? 'newspaper' : ($ext === 'pdf' ? 'picture_as_pdf' : 'description') }}
+                                        </span>
                                     </div>
                                     <div>
-                                        <h4 class="font-bold text-sm text-primary">Dokumen Buletin (PDF)</h4>
-                                        <p class="text-xs text-outline">Format resmi buletin siap dibaca dan diunduh</p>
+                                        <h4 class="font-bold text-sm text-primary">Dokumen Buletin ({{ strtoupper($ext) }})</h4>
+                                        <p class="text-xs text-outline">
+                                            {{ $ext === 'pub' ? 'Format Microsoft Publisher (.pub) siap diunduh & diakses' : 'Format dokumen buletin resmi jemaat siap diunduh' }}
+                                        </p>
                                     </div>
                                 </div>
                                 <a href="{{ asset('storage/' . $warta->buletin_file) }}" target="_blank" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 shrink-0">
-                                    <span class="material-symbols-outlined text-[16px]">open_in_new</span>
-                                    <span>Buka Dokumen Buletin</span>
+                                    <span class="material-symbols-outlined text-[16px]">download</span>
+                                    <span>Unduh File Buletin (.{{ strtoupper($ext) }})</span>
                                 </a>
                             </div>
                         @elseif($warta->buletin_tipe === 'link' && $warta->buletin_link)

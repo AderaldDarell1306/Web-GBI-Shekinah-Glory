@@ -67,7 +67,7 @@ class WartaController extends Controller
             'file_pdf' => 'nullable|file|mimes:pdf|max:10240',
             'buletin_tipe' => 'nullable|in:none,upload,link,manual',
             'buletin_judul' => 'nullable|string|max:200',
-            'buletin_file' => 'nullable|file|mimes:pdf|max:20480',
+            'buletin_file' => 'nullable|file|max:30720',
             'buletin_link' => 'nullable|string|max:500',
             'buletin_content' => 'nullable|string',
         ]);
@@ -148,7 +148,7 @@ class WartaController extends Controller
             'file_pdf' => 'nullable|file|mimes:pdf|max:10240',
             'buletin_tipe' => 'nullable|in:none,upload,link,manual',
             'buletin_judul' => 'nullable|string|max:200',
-            'buletin_file' => 'nullable|file|mimes:pdf|max:20480',
+            'buletin_file' => 'nullable|file|max:30720',
             'buletin_link' => 'nullable|string|max:500',
             'buletin_content' => 'nullable|string',
         ]);

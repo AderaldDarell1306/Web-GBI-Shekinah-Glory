@@ -19,12 +19,14 @@ class PendaftaranLayanan extends Model
         'email',
         'alamat',
         'data_tambahan',
+        'berkas_dokumen',
         'status',
         'catatan_admin',
     ];
 
     protected $casts = [
         'data_tambahan' => 'array',
+        'berkas_dokumen' => 'array',
     ];
 
     public function getJenisLayananLabelAttribute(): string

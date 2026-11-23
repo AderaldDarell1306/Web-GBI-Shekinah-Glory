@@ -62,25 +62,44 @@
         </div>
 
         <!-- Misi -->
-        <div class="bg-white rounded-2xl p-7 shadow-sm border border-outline-variant/30 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="150">
+        <div class="bg-primary text-white rounded-2xl p-7 shadow-md flex flex-col justify-between" data-aos="fade-up" data-aos-delay="150">
             <div class="space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-[28px]">menu_book</span>
+                <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-secondary-fixed">
+                    <span class="material-symbols-outlined text-[28px]">rocket_launch</span>
                 </div>
-                <h3 class="font-serif-display text-xl font-bold text-primary">Misi Pelayanan</h3>
-                <p class="text-xs text-on-surface-variant leading-relaxed">
-                    Menjangkau & Memperlengkapi setiap orang kudus dengan <strong>pelayanan 5 Jawatan</strong> (Rasul, Nabi, Penginjil, Guru, Gembala) untuk memenuhi <strong>5 panggilan gereja</strong>:
+                <h3 class="font-serif-display text-xl font-bold">Misi Pelayanan</h3>
+                <p class="text-xs sm:text-sm text-white/90 leading-relaxed pt-1">
+                    Menjangkau &amp; Memperlengkapi setiap orang kudus dengan <strong>pelayanan 5 Jawatan</strong> (Rasul, Nabi, Penginjil, Guru, Gembala) untuk memenuhi <strong>5 panggilan gereja</strong>:
                 </p>
-                <div class="space-y-1 text-2xs text-primary font-semibold">
-                    <p>• Menyembah (Proskuneo) & Bersekutu (Koinonia)</p>
-                    <p>• Bersaksi (Marturia) & Melayani (Diakonia)</p>
-                    <p>• Memuridkan (Disciples) & Agent of Change</p>
+                <div class="space-y-1 text-2xs text-secondary-fixed font-semibold">
+                    <p>• Menyembah (Proskuneo) &amp; Bersekutu (Koinonia)</p>
+                    <p>• Bersaksi (Marturia) &amp; Melayani (Diakonia)</p>
+                    <p>• Memuridkan (Disciples) &amp; Agent of Change</p>
                 </div>
             </div>
-            <div class="pt-4 mt-4 border-t border-outline-variant/15 text-2xs text-secondary font-bold">
+            <div class="pt-4 mt-4 border-t border-white/10 text-2xs text-secondary-fixed font-bold">
                 Amanat Agung Kristus
             </div>
         </div>
+    </div>
+
+    <!-- SEKSI VALUE (NILAI-NILAI INTI GEREJA) - FORMAT MEMANJANG PENUH SEIRAMA VISI & MISI -->
+    <div class="bg-primary text-white rounded-2xl p-7 sm:p-9 shadow-md flex flex-col justify-between mb-16 w-full" data-aos="fade-up">
+        <div class="space-y-4 w-full">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-secondary-fixed shrink-0">
+                    <span class="material-symbols-outlined text-[28px]">verified</span>
+                </div>
+                <div>
+                    <h3 class="font-serif-display text-xl sm:text-2xl font-bold">Values</h3>
+                    <span class="text-2xs text-secondary-fixed font-semibold tracking-wider uppercase block">Fondasi Karakter &amp; Gaya Hidup Jemaat</span>
+                </div>
+            </div>
+            <!-- Kalimat Narasi Memanjang Penuh ke Kanan -->
+            <p class="text-xs sm:text-sm text-white/95 leading-relaxed sm:leading-loose text-justify italic pt-1 w-full font-serif-display">
+                " KeTuhanan Kristus, Hubungan terikat janji, Melayani dengan Hati Hamba, Integritas, Sebagai Kepunyaan Tuhan."
+            </p>
+        </div>       
     </div>
 
     <!-- Slogan & Identitas Utama: Be House of Glory -->

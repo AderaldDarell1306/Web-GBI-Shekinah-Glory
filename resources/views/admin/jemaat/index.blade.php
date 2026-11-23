@@ -43,6 +43,299 @@
     </div>
 
     <!-- ======================================================== -->
+    <!-- VISUALISASI GRAFIK & DEMOGRAFI JEMAAT (PRD v2.2 Tahap 5) -->
+    <!-- ======================================================== -->
+    <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-outline-variant/30 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/20 pb-3">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-[24px]">analytics</span>
+                <div>
+                    <h3 class="font-serif-display text-lg font-bold text-primary">Demografi Jemaat</h3>
+                    <p class="text-xs text-on-surface-variant">Kaum, Gender, Kepala Keluarga (KK), Status Baptis &amp; Penyerahan Anak, Pendidikan, serta Kategori Khusus.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-secondary bg-secondary-container/40 px-3 py-1 rounded-full">
+                    Sensus Induk Terverifikasi
+                </span>
+            </div>
+        </div>
+
+        <!-- 5 Executive Indicator Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            <!-- 1. Total Jemaat & Gender -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-2xs font-bold text-outline uppercase tracking-wider block">Total Jiwa</span>
+                    <span class="text-2xl font-bold font-serif-display text-primary mt-0.5 block">{{ number_format($demo['totalJemaat'] ?? $jemaats->total()) }}</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-2xs">
+                    <span class="text-blue-700 font-semibold">{{ $demo['gender']['pria'] ?? 0 }} Pria</span>
+                    <span class="text-rose-700 font-semibold">{{ $demo['gender']['wanita'] ?? 0 }} Wanita</span>
+                </div>
+            </div>
+
+            <!-- 2. Kepala Keluarga (KK) -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-2xs font-bold text-outline uppercase tracking-wider block">Kepala Keluarga</span>
+                    <span class="text-2xl font-bold font-serif-display text-primary mt-0.5 block">{{ number_format($demo['totalKk'] ?? 0) }}</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-2xs text-outline">
+                    <span>Rata-rata Jiwa</span>
+                    <strong class="text-primary">{{ $demo['avgJiwaPerKk'] ?? 0 }} / KK</strong>
+                </div>
+            </div>
+
+            <!-- 3. Status Baptis Air -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-2xs font-bold text-outline uppercase tracking-wider block">Status Baptis</span>
+                    <span class="text-2xl font-bold font-serif-display text-secondary mt-0.5 block">{{ $demo['baptis']['sudah'] ?? 0 }}</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-2xs">
+                    <span class="text-secondary font-bold">{{ $demo['pctBaptis'] ?? 0 }}% Sudah</span>
+                    <span class="text-outline">{{ $demo['baptis']['belum'] ?? 0 }} Belum</span>
+                </div>
+            </div>
+
+            <!-- 4. Penyerahan Anak -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-2xs font-bold text-outline uppercase tracking-wider block">Penyerahan Anak</span>
+                    <span class="text-2xl font-bold font-serif-display text-emerald-700 mt-0.5 block">{{ $demo['penyerahan']['sudah'] ?? 0 }}</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-2xs">
+                    <span class="text-emerald-700 font-bold">{{ $demo['pctPenyerahan'] ?? 0 }}% Sudah</span>
+                    <span class="text-outline">{{ $demo['penyerahan']['belum'] ?? 0 }} Belum</span>
+                </div>
+            </div>
+
+            <!-- 5. Kategori Khusus (Diakonia) -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-2xs font-bold text-outline uppercase tracking-wider block">Kategori Khusus</span>
+                    <span class="text-2xl font-bold font-serif-display text-amber-800 mt-0.5 block">{{ ($demo['diakonia']['lansia'] ?? 0) + ($demo['diakonia']['janda'] ?? 0) + ($demo['diakonia']['duda'] ?? 0) }}</span>
+                </div>
+                <div class="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-2xs">
+                    <span class="text-amber-800 font-semibold">{{ $demo['diakonia']['lansia'] ?? 0 }} Lansia</span>
+                    <span class="text-outline">{{ $demo['diakonia']['janda'] ?? 0 }} Janda • {{ $demo['diakonia']['duda'] ?? 0 }} Duda</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- SUB-PANEL 1: KAUM & GENDER -->
+        <!-- ============================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-1 border-t border-outline-variant/20">
+            <!-- 1A: Donut Kaum -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">donut_large</span>
+                        Proporsi Kaum
+                    </span>
+                    <span class="text-2xs text-outline font-mono">4 Kaum</span>
+                </div>
+                <div class="relative w-full h-44 flex items-center justify-center my-auto">
+                    <canvas id="chartJemaatKaum"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-1 text-[10px] mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="text-blue-700 font-semibold">Bapak: {{ $demo['kategorial']['kaum_bapak'] ?? 0 }}</span>
+                    <span class="text-rose-700 font-semibold">Ibu: {{ $demo['kategorial']['kaum_ibu'] ?? 0 }}</span>
+                    <span class="text-amber-700 font-semibold">Pemuda: {{ $demo['kategorial']['pemuda_remaja'] ?? 0 }}</span>
+                    <span class="text-emerald-700 font-semibold">Anak: {{ $demo['kategorial']['anak'] ?? 0 }}</span>
+                </div>
+            </div>
+
+            <!-- 1B: Batang Kaum -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">bar_chart</span>
+                        Jumlah Per Kaum
+                    </span>
+                    <span class="text-2xs text-outline font-mono">{{ $demo['totalJemaat'] ?? 0 }} Jiwa</span>
+                </div>
+                <div class="relative w-full h-44">
+                    <canvas id="chartJemaatKaumBar"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="font-bold text-primary">Bapak {{ $demo['kategorial']['kaum_bapak'] ?? 0 }} • Ibu {{ $demo['kategorial']['kaum_ibu'] ?? 0 }}</span>
+                </div>
+            </div>
+
+            <!-- 2A: Donut Gender -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">donut_large</span>
+                        Proporsi Gender
+                    </span>
+                    <span class="text-2xs text-outline font-mono">L vs P</span>
+                </div>
+                <div class="relative w-full h-44 flex items-center justify-center my-auto">
+                    <canvas id="chartJemaatGender"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-1 text-[10px] mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="text-blue-700 font-semibold">Pria: {{ $demo['gender']['pria'] ?? 0 }} ({{ $demo['pctPria'] ?? 0 }}%)</span>
+                    <span class="text-rose-700 font-semibold">Wanita: {{ $demo['gender']['wanita'] ?? 0 }} ({{ $demo['pctWanita'] ?? 0 }}%)</span>
+                </div>
+            </div>
+
+            <!-- 2B: Batang Gender -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">bar_chart</span>
+                        Jumlah Gender
+                    </span>
+                    <span class="text-2xs text-outline font-mono">Pria &amp; Wanita</span>
+                </div>
+                <div class="relative w-full h-44">
+                    <canvas id="chartJemaatGenderBar"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="font-bold text-primary">{{ $demo['gender']['pria'] ?? 0 }} Pria • {{ $demo['gender']['wanita'] ?? 0 }} Wanita</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- SUB-PANEL 2: KK, SAKRAMEN, PENDIDIKAN & DIAKONIA -->
+        <!-- ============================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-1 border-t border-outline-variant/20">
+            <!-- 3A: Donut KK Per Wilayah -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">donut_large</span>
+                        Proporsi KK Wilayah
+                    </span>
+                    <span class="text-2xs text-secondary font-bold">{{ $demo['totalKk'] ?? 0 }} KK</span>
+                </div>
+                <div class="relative w-full h-44 flex items-center justify-center my-auto">
+                    <canvas id="chartJemaatKkDonut"></canvas>
+                </div>
+                <div class="grid grid-cols-3 gap-1 text-[9px] text-center mt-2 pt-2 border-t border-outline-variant/20">
+                    <span>Namosain: {{ $demo['kkWilayah']['Namosain'] ?? 0 }}</span>
+                    <span>R7: {{ $demo['kkWilayah']['Rumah 7'] ?? 0 }}</span>
+                    <span>Osmok: {{ $demo['kkWilayah']['Osmok'] ?? 0 }}</span>
+                </div>
+            </div>
+
+            <!-- 3B: Batang KK Per Wilayah -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">bar_chart</span>
+                        Sebaran KK Wilayah
+                    </span>
+                    <span class="text-2xs text-outline font-mono">3 Wilayah</span>
+                </div>
+                <div class="relative w-full h-44">
+                    <canvas id="chartJemaatKkBar"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="font-bold text-primary">Namosain {{ $demo['kkWilayah']['Namosain'] ?? 0 }} • R7 {{ $demo['kkWilayah']['Rumah 7'] ?? 0 }} • Osmok {{ $demo['kkWilayah']['Osmok'] ?? 0 }}</span>
+                </div>
+            </div>
+
+            <!-- 4A: Donut Baptis Air -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">donut_large</span>
+                        Status Baptis
+                    </span>
+                    <span class="text-2xs text-secondary font-bold">{{ $demo['pctBaptis'] ?? 0 }}%</span>
+                </div>
+                <div class="relative w-full h-44 flex items-center justify-center my-auto">
+                    <canvas id="chartJemaatBaptisDonut"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="text-green-700 font-bold">Sudah: {{ $demo['baptis']['sudah'] ?? 0 }}</span>
+                    <span>Belum: {{ $demo['baptis']['belum'] ?? 0 }}</span>
+                </div>
+            </div>
+
+            <!-- 4B: Donut Penyerahan Anak -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-emerald-700">donut_large</span>
+                        Penyerahan Anak
+                    </span>
+                    <span class="text-2xs text-emerald-700 font-bold">{{ $demo['pctPenyerahan'] ?? 0 }}%</span>
+                </div>
+                <div class="relative w-full h-44 flex items-center justify-center my-auto">
+                    <canvas id="chartJemaatPenyerahanDonut"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="text-emerald-700 font-bold">Sudah: {{ $demo['penyerahan']['sudah'] ?? 0 }}</span>
+                    <span>Belum: {{ $demo['penyerahan']['belum'] ?? 0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- SUB-PANEL 3: PENDIDIKAN & KATEGORI KHUSUS -->
+        <!-- ============================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 border-t border-outline-variant/20">
+            <!-- 5: Batang Pendidikan -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">school</span>
+                        Jenjang Pendidikan
+                    </span>
+                    <span class="text-2xs text-outline font-mono">{{ count($demo['pendidikanMap'] ?? []) }} Jenjang</span>
+                </div>
+                <div class="relative w-full h-44">
+                    <canvas id="chartJemaatPendidikan"></canvas>
+                </div>
+                <div class="flex items-center justify-end text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span class="font-bold text-primary">{{ count($demo['pendidikanMap'] ?? []) }} Tingkat Pendidikan</span>
+                </div>
+            </div>
+
+            <!-- 6A: Batang Kategori Khusus -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-amber-700">bar_chart</span>
+                        Rincian Kategori Khusus
+                    </span>
+                    <span class="text-2xs text-amber-800 font-bold">Diakonia</span>
+                </div>
+                <div class="relative w-full h-44">
+                    <canvas id="chartJemaatDiakoniaBar"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span>Lansia: {{ $demo['diakonia']['lansia'] ?? 0 }} • Janda: {{ $demo['diakonia']['janda'] ?? 0 }} • Duda: {{ $demo['diakonia']['duda'] ?? 0 }}</span>
+                </div>
+            </div>
+
+            <!-- 6B: Donut Kategori Khusus -->
+            <div class="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px] text-amber-700">donut_large</span>
+                        Proporsi Kategori Khusus
+                    </span>
+                    <span class="text-2xs text-outline font-mono">Komposisi</span>
+                </div>
+                <div class="relative w-full h-44 flex items-center justify-center my-auto">
+                    <canvas id="chartJemaatDiakoniaDonut"></canvas>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-outline mt-2 pt-2 border-t border-outline-variant/20">
+                    <span>Lansia, Janda, Duda &amp; Yatim</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
     <!-- REKAPITULASI KATEGORIAL PELAYANAN (BAPAK, IBU, PEMUDA, ANAK) -->
     <!-- ======================================================== -->
     <div class="space-y-2.5">
@@ -697,4 +990,405 @@ document.addEventListener('DOMContentLoaded', function() {
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Plugin Universal: Menampilkan Angka di Dalam Irisan Donut & di Ujung/Atas Batang
+    const universalDataLabelsPlugin = {
+        id: 'universalDataLabels',
+        afterDatasetsDraw(chart) {
+            if (chart.config.type === 'line') return;
+            const { ctx } = chart;
+            chart.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
+                if (!meta || meta.hidden) return;
+                meta.data.forEach((element, index) => {
+                    const val = dataset.data[index];
+                    if (val === undefined || val === null || val <= 0) return;
+                    ctx.save();
+                    if (chart.config.type === 'doughnut' || chart.config.type === 'pie') {
+                        let x, y;
+                        if (typeof element.tooltipPosition === 'function') {
+                            const pos = element.tooltipPosition();
+                            x = pos.x;
+                            y = pos.y;
+                        } else if (element.x !== undefined && element.startAngle !== undefined) {
+                            const midAngle = element.startAngle + (element.endAngle - element.startAngle) / 2;
+                            const midRadius = element.innerRadius + (element.outerRadius - element.innerRadius) / 2;
+                            x = element.x + Math.cos(midAngle) * midRadius;
+                            y = element.y + Math.sin(midAngle) * midRadius;
+                        }
+                        if (x !== undefined && y !== undefined) {
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = 'bold 10px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+                            ctx.shadowBlur = 3;
+                            ctx.fillText(Number(val).toLocaleString('id-ID'), x, y);
+                        }
+                    } else if (chart.config.type === 'bar') {
+                        ctx.fillStyle = '#001428';
+                        ctx.font = 'bold 9px sans-serif';
+                        if (chart.options.indexAxis === 'y') {
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(Number(val).toLocaleString('id-ID'), element.x + 3, element.y);
+                        } else {
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillText(Number(val).toLocaleString('id-ID'), element.x, element.y - 2);
+                        }
+                    }
+                    ctx.restore();
+                });
+            });
+        }
+    };
+
+    // Plugin Universal: Menampilkan Angka Total di Tengah Donut
+    const donutCenterTotalPlugin = {
+        id: 'donutCenterTotal',
+        beforeDraw(chart) {
+            if (chart.config.type !== 'doughnut') return;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return;
+            const { top, left, width, height } = chartArea;
+            const dataset = chart.data.datasets[0];
+            if (!dataset || !dataset.data) return;
+            const total = dataset.data.reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+            if (total <= 0) return;
+            ctx.save();
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillStyle = '#001428';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(Number(total).toLocaleString('id-ID'), left + width / 2, top + height / 2 - 4);
+            ctx.font = 'bold 8px sans-serif';
+            ctx.fillStyle = '#775a19';
+            ctx.fillText('TOTAL', left + width / 2, top + height / 2 + 7);
+            ctx.restore();
+        }
+    };
+
+    Chart.register(universalDataLabelsPlugin, donutCenterTotalPlugin);
+
+    // 1A. Chart Kategorial (Donut)
+    const ctxKaum = document.getElementById('chartJemaatKaum');
+    if (ctxKaum) {
+        new Chart(ctxKaum, {
+            type: 'doughnut',
+            data: {
+                labels: ['Kaum Bapak', 'Kaum Ibu', 'Pemuda & Remaja', 'Anak-Anak'],
+                datasets: [{
+                    data: [
+                        {{ $demo['kategorial']['kaum_bapak'] ?? 0 }},
+                        {{ $demo['kategorial']['kaum_ibu'] ?? 0 }},
+                        {{ $demo['kategorial']['pemuda_remaja'] ?? 0 }},
+                        {{ $demo['kategorial']['anak'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#2563eb', '#e11d48', '#f59e0b', '#059669'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // 1B. Chart Kategorial (Batang)
+    const ctxKaumBar = document.getElementById('chartJemaatKaumBar');
+    if (ctxKaumBar) {
+        new Chart(ctxKaumBar, {
+            type: 'bar',
+            data: {
+                labels: ['Bapak', 'Ibu', 'Pemuda', 'Anak'],
+                datasets: [{
+                    label: 'Jiwa',
+                    data: [
+                        {{ $demo['kategorial']['kaum_bapak'] ?? 0 }},
+                        {{ $demo['kategorial']['kaum_ibu'] ?? 0 }},
+                        {{ $demo['kategorial']['pemuda_remaja'] ?? 0 }},
+                        {{ $demo['kategorial']['anak'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#2563eb', '#e11d48', '#f59e0b', '#059669'],
+                    borderRadius: 4,
+                    maxBarThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grace: '12%', grid: { color: '#f3f4f6' }, ticks: { font: { size: 8 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                }
+            }
+        });
+    }
+
+    // 2A. Chart Gender (Donut)
+    const ctxGen = document.getElementById('chartJemaatGender');
+    if (ctxGen) {
+        new Chart(ctxGen, {
+            type: 'doughnut',
+            data: {
+                labels: ['Laki-Laki', 'Perempuan'],
+                datasets: [{
+                    data: [
+                        {{ $demo['gender']['pria'] ?? 0 }},
+                        {{ $demo['gender']['wanita'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#2563eb', '#e11d48'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // 2B. Chart Gender (Batang)
+    const ctxGenBar = document.getElementById('chartJemaatGenderBar');
+    if (ctxGenBar) {
+        new Chart(ctxGenBar, {
+            type: 'bar',
+            data: {
+                labels: ['Laki-Laki', 'Perempuan'],
+                datasets: [{
+                    label: 'Jiwa',
+                    data: [
+                        {{ $demo['gender']['pria'] ?? 0 }},
+                        {{ $demo['gender']['wanita'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#2563eb', '#e11d48'],
+                    borderRadius: 4,
+                    maxBarThickness: 26
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grace: '12%', grid: { color: '#f3f4f6' }, ticks: { font: { size: 8 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                }
+            }
+        });
+    }
+
+    // 3A. Chart KK (Donut Sebaran Wilayah)
+    const ctxKkDonut = document.getElementById('chartJemaatKkDonut');
+    if (ctxKkDonut) {
+        new Chart(ctxKkDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Namosain', 'Rumah 7', 'Osmok'],
+                datasets: [{
+                    data: [
+                        {{ $demo['kkWilayah']['Namosain'] ?? 0 }},
+                        {{ $demo['kkWilayah']['Rumah 7'] ?? 0 }},
+                        {{ $demo['kkWilayah']['Osmok'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#775a19', '#2563eb', '#059669'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // 3B. Chart KK (Batang Sebaran Wilayah)
+    const ctxKkBar = document.getElementById('chartJemaatKkBar');
+    if (ctxKkBar) {
+        new Chart(ctxKkBar, {
+            type: 'bar',
+            data: {
+                labels: ['Namosain', 'Rumah 7', 'Osmok'],
+                datasets: [{
+                    label: 'KK',
+                    data: [
+                        {{ $demo['kkWilayah']['Namosain'] ?? 0 }},
+                        {{ $demo['kkWilayah']['Rumah 7'] ?? 0 }},
+                        {{ $demo['kkWilayah']['Osmok'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#775a19', '#2563eb', '#059669'],
+                    borderRadius: 4,
+                    maxBarThickness: 22
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grace: '12%', grid: { color: '#f3f4f6' }, ticks: { font: { size: 8 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                }
+            }
+        });
+    }
+
+    // 4A. Chart Baptis (Donut)
+    const ctxBapDonut = document.getElementById('chartJemaatBaptisDonut');
+    if (ctxBapDonut) {
+        new Chart(ctxBapDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sudah', 'Belum'],
+                datasets: [{
+                    data: [
+                        {{ $demo['baptis']['sudah'] ?? 0 }},
+                        {{ $demo['baptis']['belum'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#059669', '#d1d5db'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // 4B. Chart Penyerahan Anak (Donut)
+    const ctxPenDonut = document.getElementById('chartJemaatPenyerahanDonut');
+    if (ctxPenDonut) {
+        new Chart(ctxPenDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sudah', 'Belum'],
+                datasets: [{
+                    data: [
+                        {{ $demo['penyerahan']['sudah'] ?? 0 }},
+                        {{ $demo['penyerahan']['belum'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#059669', '#d1d5db'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // 5. Chart Pendidikan (Horizontal Bar)
+    const ctxPdk = document.getElementById('chartJemaatPendidikan');
+    if (ctxPdk) {
+        const pdkData = @json($demo['pendidikanMap'] ?? []);
+        new Chart(ctxPdk, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(pdkData),
+                datasets: [{
+                    label: 'Jiwa',
+                    data: Object.values(pdkData),
+                    backgroundColor: '#775a19',
+                    borderRadius: 4,
+                    maxBarThickness: 14
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, grace: '12%', grid: { color: '#f3f4f6' }, ticks: { font: { size: 8 } } },
+                    y: { grid: { display: false }, ticks: { font: { size: 8 } } }
+                }
+            }
+        });
+    }
+
+    // 6A. Chart Diakonia (Batang)
+    const ctxDiakBar = document.getElementById('chartJemaatDiakoniaBar');
+    if (ctxDiakBar) {
+        new Chart(ctxDiakBar, {
+            type: 'bar',
+            data: {
+                labels: ['Lansia', 'Janda', 'Duda', 'Yatim'],
+                datasets: [{
+                    label: 'Jiwa',
+                    data: [
+                        {{ $demo['diakonia']['lansia'] ?? 0 }},
+                        {{ $demo['diakonia']['janda'] ?? 0 }},
+                        {{ $demo['diakonia']['duda'] ?? 0 }},
+                        {{ $demo['diakonia']['yatim_piatu'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#d97706', '#775a19', '#001428', '#2563eb'],
+                    borderRadius: 4,
+                    maxBarThickness: 18
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grace: '12%', grid: { color: '#f3f4f6' }, ticks: { font: { size: 8 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 8 } } }
+                }
+            }
+        });
+    }
+
+    // 6B. Chart Diakonia (Donut)
+    const ctxDiakDonut = document.getElementById('chartJemaatDiakoniaDonut');
+    if (ctxDiakDonut) {
+        new Chart(ctxDiakDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Lansia', 'Janda', 'Duda', 'Yatim'],
+                datasets: [{
+                    data: [
+                        {{ $demo['diakonia']['lansia'] ?? 0 }},
+                        {{ $demo['diakonia']['janda'] ?? 0 }},
+                        {{ $demo['diakonia']['duda'] ?? 0 }},
+                        {{ $demo['diakonia']['yatim_piatu'] ?? 0 }}
+                    ],
+                    backgroundColor: ['#d97706', '#775a19', '#001428', '#2563eb'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '60%'
+            }
+        });
+    }
+});
+</script>
+@endpush
 @endsection

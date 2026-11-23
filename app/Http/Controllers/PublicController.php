@@ -7,6 +7,9 @@ use App\Models\Jemaat;
 use App\Models\TransaksiKeuangan;
 use App\Models\WebsiteContent;
 use App\Models\Wilayah;
+use App\Models\ArsipSurat;
+use App\Models\Inventaris;
+use App\Models\PeminjamanInventaris;
 use Illuminate\Http\Request;
 
 class PublicController extends Controller
@@ -268,27 +271,72 @@ class PublicController extends Controller
     }
 
     /**
-     * Halaman Warta Jemaat Digital (Publik)
+     * Katalog / Galeri Arsip Warta Jemaat & Buletin Digital
      */
     public function warta(Request $request)
     {
-        $contents = WebsiteContent::all()->pluck('value', 'key');
-        $id = $request->query('id');
-
-        if ($id) {
-            $warta = \App\Models\WartaJemaat::where('status', 'terbit')->find($id);
-        } else {
-            $warta = \App\Models\WartaJemaat::where('status', 'terbit')->orderBy('tanggal_warta', 'desc')->first();
+        // Jika ada parameter ?id=X, redirect ke URL edisi khusus /warta/{id}
+        if ($request->filled('id')) {
+            return redirect()->route('public.warta.detail', $request->query('id'));
         }
 
-        $arsipWarta = \App\Models\WartaJemaat::where('status', 'terbit')
+        $contents = WebsiteContent::all()->pluck('value', 'key');
+        
+        $query = \App\Models\WartaJemaat::where('status', 'terbit');
+
+        if ($request->filled('q')) {
+            $keyword = $request->query('q');
+            $query->where(function($q) use ($keyword) {
+                $q->where('tema_mingguan', 'like', "%{$keyword}%")
+                  ->orWhere('edisi', 'like', "%{$keyword}%")
+                  ->orWhere('ayat_tema', 'like', "%{$keyword}%")
+                  ->orWhere('ringkasan_khotbah', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($request->filled('tahun')) {
+            $query->whereYear('tanggal_warta', $request->query('tahun'));
+        }
+
+        $latestWarta = \App\Models\WartaJemaat::where('status', 'terbit')->orderBy('tanggal_warta', 'desc')->first();
+        $arsipWarta = $query->orderBy('tanggal_warta', 'desc')->paginate(9)->withQueryString();
+
+        $tahunList = \App\Models\WartaJemaat::where('status', 'terbit')
+            ->selectRaw('YEAR(tanggal_warta) as tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+
+        return view('public.warta-index', compact('contents', 'latestWarta', 'arsipWarta', 'tahunList'));
+    }
+
+    /**
+     * Halaman Baca Khusus per Edisi Warta Jemaat (/warta/{id})
+     */
+    public function wartaDetail(Request $request, $id)
+    {
+        $contents = WebsiteContent::all()->pluck('value', 'key');
+        $warta = \App\Models\WartaJemaat::where('status', 'terbit')->findOrFail($id);
+
+        $prevWarta = \App\Models\WartaJemaat::where('status', 'terbit')
+            ->where('tanggal_warta', '<', $warta->tanggal_warta)
             ->orderBy('tanggal_warta', 'desc')
-            ->take(8)
+            ->first();
+
+        $nextWarta = \App\Models\WartaJemaat::where('status', 'terbit')
+            ->where('tanggal_warta', '>', $warta->tanggal_warta)
+            ->orderBy('tanggal_warta', 'asc')
+            ->first();
+
+        $arsipLain = \App\Models\WartaJemaat::where('status', 'terbit')
+            ->where('id', '!=', $warta->id)
+            ->orderBy('tanggal_warta', 'desc')
+            ->take(4)
             ->get();
 
-        $ultahList = $warta ? $warta->jemaat_ulang_tahun_minggu_ini : collect();
+        $ultahList = $warta->jemaat_ulang_tahun_minggu_ini;
 
-        return view('public.warta', compact('contents', 'warta', 'arsipWarta', 'ultahList'));
+        return view('public.warta-detail', compact('contents', 'warta', 'prevWarta', 'nextWarta', 'arsipLain', 'ultahList'));
     }
 
     /**
@@ -315,11 +363,96 @@ class PublicController extends Controller
             'email' => 'nullable|email|max:100',
             'alamat' => 'nullable|string',
             'data_tambahan' => 'nullable|array',
+            // Slot Berkas Dokumen Terpisah sesuai formulir fisik asli
+            'file_ktp' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_kk' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_pas_foto' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_akta_anak' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_ktp_ortu' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_ktp_pria' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_ktp_wanita' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_kk_pria' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_kk_wanita' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_baptis_pria' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_baptis_wanita' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_akta_pria' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_akta_wanita' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_foto_gandeng' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_akta_baptis' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'file_akta_lahir' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
+            'berkas_dokumen.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,docx|max:10240',
         ]);
 
-        $prefix = strtoupper(substr($validated['jenis_layanan'], 0, 3));
+        $prefix = match ($validated['jenis_layanan']) {
+            'baptis' => 'BAP',
+            'penyerahan_anak' => 'ANA',
+            'nikah' => 'NKH',
+            'jemaat_baru' => 'JMB',
+            default => 'REG',
+        };
         $kode = sprintf('%s-%s-%04d', $prefix, date('Ymd'), rand(100, 9999));
         $validated['kode_pendaftaran'] = $kode;
+
+        // Slot nama/label berkas sesuai berkas yang diminta pada dokumen fisik asli
+        $slotLabels = [
+            'file_ktp' => 'Fotocopy KTP Pemohon',
+            'file_kk' => 'Fotocopy Kartu Keluarga (KK)',
+            'file_pas_foto' => 'Pas Foto',
+            'file_akta_anak' => 'Fotocopy Akte Lahir Anak / Surat Kenal Lahir',
+            'file_ktp_ortu' => 'Fotocopy KTP Orang Tua (Ayah / Ibu)',
+            'file_ktp_pria' => 'Fotocopy KTP Calon Pengantin Pria',
+            'file_ktp_wanita' => 'Fotocopy KTP Calon Pengantin Wanita',
+            'file_kk_pria' => 'Fotocopy Kartu Keluarga (KK) Pria',
+            'file_kk_wanita' => 'Fotocopy Kartu Keluarga (KK) Wanita',
+            'file_baptis_pria' => 'Surat Baptis / Sidi Calon Pengantin Pria',
+            'file_baptis_wanita' => 'Surat Baptis / Sidi Calon Pengantin Wanita',
+            'file_akta_pria' => 'Fotocopy Akte Kelahiran Calon Pengantin Pria',
+            'file_akta_wanita' => 'Fotocopy Akte Kelahiran Calon Pengantin Wanita',
+            'file_foto_gandeng' => 'Pas Foto Gandeng Calon Pengantin (4x6)',
+            'file_akta_baptis' => 'Fotocopy Akta Baptis',
+            'file_akta_lahir' => 'Fotocopy Akta Kelahiran',
+        ];
+
+        $uploadedFiles = [];
+
+        // 1. Simpan berkas dari slot terpisah
+        foreach ($slotLabels as $slotKey => $slotTitle) {
+            if ($request->hasFile($slotKey)) {
+                $file = $request->file($slotKey);
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $path = $file->store('pendaftaran_berkas', 'public');
+                    $uploadedFiles[] = [
+                        'kategori' => $slotTitle,
+                        'slot_key' => $slotKey,
+                        'nama_file' => $originalName,
+                        'path' => $path,
+                        'ukuran' => round($file->getSize() / 1024, 1) . ' KB',
+                        'ekstensi' => strtolower($file->getClientOriginalExtension()),
+                    ];
+                }
+            }
+        }
+
+        // 2. Simpan jika ada berkas dokumen multi/tambahan
+        if ($request->hasFile('berkas_dokumen')) {
+            foreach ($request->file('berkas_dokumen') as $file) {
+                if ($file && $file->isValid()) {
+                    $originalName = $file->getClientOriginalName();
+                    $path = $file->store('pendaftaran_berkas', 'public');
+                    $uploadedFiles[] = [
+                        'kategori' => 'Dokumen Tambahan',
+                        'slot_key' => 'tambahan',
+                        'nama_file' => $originalName,
+                        'path' => $path,
+                        'ukuran' => round($file->getSize() / 1024, 1) . ' KB',
+                        'ekstensi' => strtolower($file->getClientOriginalExtension()),
+                    ];
+                }
+            }
+        }
+
+        $validated['berkas_dokumen'] = $uploadedFiles;
 
         $pendaftaran = \App\Models\PendaftaranLayanan::create($validated);
 
@@ -359,5 +492,91 @@ class PublicController extends Controller
             ->pluck('kategori_kegiatan');
 
         return view('public.dokumentasi', compact('contents', 'fotoList', 'kategoriList', 'kategori'));
+    }
+
+    /**
+     * Halaman Cek & Unduh Surat Resmi via Kode Unik (PRD v2.2 2.2 B)
+     */
+    public function cekSurat(Request $request)
+    {
+        $contents = WebsiteContent::all()->pluck('value', 'key');
+        $kode = trim($request->input('kode', ''));
+        $surat = null;
+        $error = null;
+
+        if (!empty($kode)) {
+            $surat = ArsipSurat::where('kode_akses', $kode)->first();
+            if (!$surat) {
+                $error = "Dokumen dengan Kode Akses '{$kode}' tidak ditemukan atau belum dipublikasikan oleh Sekretariat.";
+            }
+        }
+
+        return view('public.layanan.cek-surat', compact('contents', 'kode', 'surat', 'error'));
+    }
+
+    /**
+     * Formulir Pengajuan Pinjam Pakai Inventaris Gereja (PRD v2.2 2.2 C)
+     */
+    public function pinjamInventaris()
+    {
+        $contents = WebsiteContent::all()->pluck('value', 'key');
+        $barangList = Inventaris::where('status_ketersediaan', 'Tersedia')
+            ->where('kondisi', '!=', 'Rusak Berat')
+            ->orderBy('nama_barang', 'asc')
+            ->get();
+
+        return view('public.layanan.pinjam-inventaris', compact('contents', 'barangList'));
+    }
+
+    /**
+     * Submit Pengajuan Peminjaman Inventaris
+     */
+    public function submitPinjamInventaris(Request $request)
+    {
+        $validated = $request->validate([
+            'nama_peminjam' => 'required|string|max:150',
+            'no_kontak' => 'required|string|max:30',
+            'instansi_kegiatan' => 'required|string|max:150',
+            'inventaris_id' => 'nullable|exists:inventaris,id',
+            'nama_barang_custom' => 'nullable|string|max:150',
+            'jumlah_pinjam' => 'required|integer|min:1',
+            'tanggal_pinjam' => 'required|date',
+            'tanggal_rencana_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+            'catatan' => 'nullable|string',
+        ]);
+
+        if (empty($validated['inventaris_id']) && empty($validated['nama_barang_custom'])) {
+            return back()->withErrors(['inventaris_id' => 'Silakan pilih barang inventaris atau ketikkan nama barang yang ingin dipinjam.'])->withInput();
+        }
+
+        $kode = sprintf('PINJAM-%s-%04d', date('Ymd'), rand(1000, 9999));
+
+        $peminjaman = PeminjamanInventaris::create([
+            'kode_peminjaman' => $kode,
+            'inventaris_id' => $validated['inventaris_id'] ?? null,
+            'nama_barang_custom' => $validated['nama_barang_custom'] ?? null,
+            'nama_peminjam' => $validated['nama_peminjam'],
+            'no_kontak' => $validated['no_kontak'],
+            'instansi_kegiatan' => $validated['instansi_kegiatan'],
+            'tanggal_pinjam' => $validated['tanggal_pinjam'],
+            'tanggal_rencana_kembali' => $validated['tanggal_rencana_kembali'],
+            'jumlah_pinjam' => $validated['jumlah_pinjam'],
+            'status' => 'Menunggu Konfirmasi',
+            'catatan' => $validated['catatan'] ?? null,
+        ]);
+
+        return redirect()->route('public.layanan.pinjam-inventaris.sukses', $peminjaman->id)
+            ->with('success', "Pengajuan peminjaman berhasil dikirim dengan Kode: {$kode}");
+    }
+
+    /**
+     * Halaman Sukses Pengajuan Peminjaman Inventaris
+     */
+    public function pinjamInventarisSukses($id)
+    {
+        $contents = WebsiteContent::all()->pluck('value', 'key');
+        $peminjaman = PeminjamanInventaris::with('inventaris')->findOrFail($id);
+
+        return view('public.layanan.pinjam-inventaris-sukses', compact('contents', 'peminjaman'));
     }
 }
